@@ -101,7 +101,8 @@ public class PDFUtils {
     }
 
     // Funcion que agrega primer pagina del catalogo
-    public static void addFirstPage(Document doc, float pageHeight, float pageWidth, String titleTextInput, String subtitleTextInput, Theme theme)
+    public static void addFirstPage(Document doc, float pageHeight, float pageWidth, String titleTextInput,
+            String subtitleTextInput, Theme theme)
             throws Exception {
 
         if (titleTextInput == null || titleTextInput.trim().isEmpty()) {
