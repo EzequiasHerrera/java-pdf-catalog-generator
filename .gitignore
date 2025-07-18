@@ -1,0 +1,5 @@
+.idea
+/target
+excel-pdf.iml
+*.pdf
+/catalogo
