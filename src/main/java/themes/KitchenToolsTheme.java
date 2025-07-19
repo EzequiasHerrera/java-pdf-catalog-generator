@@ -10,8 +10,9 @@ import utils.PDFUtils;
 public class KitchenToolsTheme {
     public static Theme getTheme() throws MalformedURLException {
         return new Theme(
-                new DeviceRgb(59, 30, 9), // Title text
-                new DeviceRgb(59, 30, 9), // Code Background color
+                new DeviceRgb(255, 134, 28), // Title text
+                new DeviceRgb(59, 30, 9), // Subtitle text
+                new DeviceRgb(255, 135, 12), // Code Background color
                 new DeviceRgb(72, 65, 151), // Code Text Color
                 new DeviceRgb(162, 171, 145), // Card border Color
                 new DeviceRgb(255, 255, 255), // Card Text Color

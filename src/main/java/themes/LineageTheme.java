@@ -11,6 +11,7 @@ public class LineageTheme {
     public static Theme getTheme() throws MalformedURLException {
         return new Theme(
                 new DeviceRgb(66, 67, 154), // Title text
+                new DeviceRgb(66, 67, 154), // Subtitle text
                 new DeviceRgb(66, 67, 154), // Code Background color
                 new DeviceRgb(255, 255, 255), // Code Text Color
                 new DeviceRgb(125, 143, 195), // Card border Color

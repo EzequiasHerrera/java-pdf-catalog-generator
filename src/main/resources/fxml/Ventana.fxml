@@ -19,10 +19,10 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="503.0" minWidth="461.0" prefHeight="557.0" prefWidth="461.0" style="-fx-background-color: #242831;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fx.VentanaController">
+<AnchorPane minHeight="503.0" minWidth="461.0" prefHeight="557.0" prefWidth="461.0" style="-fx-background-color: #242831;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fx.VentanaController">
    <children>
       
-      <ProgressIndicator fx:id="progressIndicator" layoutX="436.0" layoutY="517.0" prefHeight="140.0" prefWidth="2.0" progress="0.0" scaleX="15.0" scaleY="0.5" visible="false" />
+      <ProgressIndicator fx:id="progressIndicator" layoutX="200.0" layoutY="525.0" prefHeight="30.0" prefWidth="30.0" progress="0.0" scaleX="15.0" scaleY="0.5" visible="false" />
       <Pane layoutX="20.0" layoutY="272.0" prefHeight="74.0" prefWidth="428.0" AnchorPane.bottomAnchor="199.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="272.0">
          <children>
             <Pane layoutX="-2.0" layoutY="4.0" prefHeight="72.0" prefWidth="435.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;" />
@@ -95,7 +95,7 @@
             <Group layoutX="201.0" layoutY="3.0">
                <children>
       
-                        <CheckBox fx:id="precioCheckBox" layoutX="26.0" layoutY="6.0" mnemonicParsing="false" onAction="#onClickPrecioColumn" prefHeight="16.0" prefWidth="26.0" selected="true" textFill="WHITE">
+                        <CheckBox fx:id="precioCheckBox" layoutX="32.0" layoutY="6.0" mnemonicParsing="false" onAction="#onClickPrecioColumn" prefHeight="16.0" prefWidth="26.0" selected="true" textFill="WHITE">
                      <font>
                         <Font name="Roboto" size="15.0" />
                      </font>
@@ -242,7 +242,7 @@
          </font>
       </Label>
 
-                        <TextArea fx:id="logTextArea" editable="false" layoutX="20.0" layoutY="109.0" prefHeight="105.0" prefWidth="428.0" style="-fx-background-color: #242831; -fx-background-radius: 20;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="109.0">
+                        <TextArea fx:id="logTextArea" editable="false" layoutX="20.0" layoutY="109.0" prefHeight="105.0" prefWidth="428.0" style="-fx-background-radius: 20; -fx-background-color: #242831;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="109.0">
          <font>
             <Font name="Roboto" size="14.0" />
          </font>
@@ -369,6 +369,9 @@
                </image>
             </ImageView>
          </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
       <Button fx:id="lineageButton" layoutX="26.0" layoutY="223.0" mnemonicParsing="false" onAction="#onClickTheme" prefHeight="45.0" prefWidth="87.0" style="-fx-background-color: #fff;">
          <graphic>
@@ -378,6 +381,14 @@
                </image>
             </ImageView>
          </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="addThemeButton" layoutX="215.0" layoutY="223.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="87.0" style="-fx-background-color: #444;">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
    </children>
 </AnchorPane>

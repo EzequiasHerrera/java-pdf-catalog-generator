@@ -33,6 +33,7 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import com.itextpdf.styledxmlparser.resolver.font.BasicFontProvider;
 
+import components.CardPortadaComponent;
 import themes.Theme;
 
 public class PDFUtils {
@@ -110,12 +111,20 @@ public class PDFUtils {
         }
 
         Paragraph titulo = new Paragraph(titleTextInput)
-                .setFontSize(60)
+                .setFontSize(50)
                 .setBold()
                 .setFontColor(theme.titleTextColor)
                 .setTextAlignment(TextAlignment.CENTER)
-                .setMarginBottom(0)
+                .setPaddingBottom(30)
+                .setPaddingTop(30)
                 .setMultipliedLeading(0.8f);
+
+        Paragraph subtitulo = new Paragraph(subtitleTextInput)
+                .setFontSize(25)
+                .setBold()
+                .setFontColor(theme.subtitleTextColor)
+                .setPadding(10)
+                .setTextAlignment(TextAlignment.CENTER);
 
         if (subtitleTextInput == null || subtitleTextInput.trim().isEmpty()) {
             String mes = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, new Locale("es"));
@@ -128,25 +137,20 @@ public class PDFUtils {
         logo.setHorizontalAlignment(HorizontalAlignment.CENTER);
         logo.setMarginBottom(20);
 
-        Paragraph subtitulo = new Paragraph(subtitleTextInput)
-                .setFontSize(30)
-                .setBold()
-                .setFontColor(theme.titleTextColor)
-                .setTextAlignment(TextAlignment.CENTER);
-
         // 🔧 Calcular altura útil, sin márgenes
         float usableHeight = pageHeight - doc.getTopMargin() - doc.getBottomMargin();
 
-        Div wrapper = new Div()
+        Div portada = new Div()
                 .setHeight(usableHeight)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .setTextAlignment(TextAlignment.CENTER);
 
-        wrapper.add(logo);
-        wrapper.add(titulo);
-        wrapper.add(subtitulo);
 
-        doc.add(wrapper);
+        //DEBO AGREGAR LA PALABRA CLIENTE O CATALOGO SEGUN CORRESPONDA
+        portada.add(logo);
+        portada.add(CardPortadaComponent.build(titulo, subtitulo));
+
+        doc.add(portada);
 
         // 🔁 Salto de página explícito para evitar desbordes en la página 2
         doc.add(new AreaBreak());

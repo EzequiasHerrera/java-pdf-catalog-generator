@@ -5,6 +5,7 @@ import com.itextpdf.kernel.colors.Color;
 
 public class Theme {
     public final Color titleTextColor;
+    public final Color subtitleTextColor;
     public final Color codeBackgroundColor;
     public final Color codeTextColor;
     public final Color cardBorderColor;
@@ -16,6 +17,7 @@ public class Theme {
 
     public Theme(
             Color titleTextColor,
+            Color subtitleTextColor,
             Color codeBackgroundColor,
             Color codeTextColor,
             Color cardBorderColor,
@@ -26,6 +28,7 @@ public class Theme {
             ImageData logoImage) {
 
         this.titleTextColor = titleTextColor;
+        this.subtitleTextColor = subtitleTextColor;
         this.codeBackgroundColor = codeBackgroundColor;
         this.codeTextColor = codeTextColor;
         this.cardBorderColor = cardBorderColor;
