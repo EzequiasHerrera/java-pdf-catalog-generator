@@ -69,7 +69,7 @@ public class VentanaController implements Initializable {
     private TextField titleTextInput;
     @FXML
     private TextField subtitleTextInput;
-    
+
     // Coloca un checkbox para cada uno de los items
     @FXML
     private CheckBox codigoCheckBox; // CODIGO
@@ -79,6 +79,8 @@ public class VentanaController implements Initializable {
     private CheckBox precioCheckBox; // PRECIO
     @FXML
     private CheckBox unidadPorBultoCheckBox; // UXB
+    @FXML
+    private CheckBox presupuestoCheckBox;
 
     // THEMES
     @FXML
@@ -105,6 +107,9 @@ public class VentanaController implements Initializable {
 
     // Archivo Excel
     private File archivoExcel;
+
+    // presupuesto o cliente
+    private boolean presupuestoActivo = false;
 
     // Directorio donde encontrar las imagenes
     private File carpetaImagenes;
@@ -181,6 +186,8 @@ public class VentanaController implements Initializable {
         productoQuantityComboBox.setValue(prefs.getInt("productoQuantityTextInput", 12));
         // productoQuantityTextInput.setText(prefs.get("productoQuantityTextInput",
         // "8"));
+        presupuestoCheckBox.setSelected(prefs.getBoolean("presupuestoCheckBox", false));
+        presupuestoActivo = presupuestoCheckBox.isSelected(); // Actualiza el valor
 
         titleTextInput.setText(prefs.get("titleTextInput", "TITULO"));
         subtitleTextInput.setText(prefs.get("subtitleTextInput", ""));
@@ -404,7 +411,8 @@ public class VentanaController implements Initializable {
                             Float.parseFloat(pageHeightTextInput.getText()),
                             codigoCheckBox.isSelected(), productoCheckBox.isSelected(), precioCheckBox.isSelected(),
                             unidadPorBultoCheckBox.isSelected(), imagenCheckBox.isSelected(), logTextArea,
-                            productoQuantityComboBox.getValue(), titleTextInput.getText(), subtitleTextInput.getText(), selectedTheme);
+                            productoQuantityComboBox.getValue(), titleTextInput.getText(), subtitleTextInput.getText(),
+                            selectedTheme, presupuestoActivo);
 
                     service.setOnRunning(e -> {
                         generarButton.setDisable(true);
@@ -452,6 +460,12 @@ public class VentanaController implements Initializable {
     }
 
     // -----------------------------------------------------//
+    @FXML
+    public void onClickPresupuestoCheckBox(Event event) {
+        presupuestoActivo = presupuestoCheckBox.isSelected();
+        System.out.println(presupuestoActivo);
+    }
+
     @FXML
     public void onClickCodigoColumn(Event event) {
         deshabilitarColumna(codigoCheckBox, codigoFontSize, codigoColorPicker);

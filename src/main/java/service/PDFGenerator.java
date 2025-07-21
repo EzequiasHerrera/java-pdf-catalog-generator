@@ -46,7 +46,7 @@ public class PDFGenerator {
             int productoQuantity,
             String titleTextInput,
             String subtitleTextInput,
-            String selectedTheme) throws Exception {
+            String selectedTheme, boolean presupuestoActivo) throws Exception {
 
         final int productsPerPage = productoQuantity; // CANTIDAD DE PRODUCTOS QUE QUIERO POR PAGINA
         final StringBuilder log = new StringBuilder();
@@ -83,7 +83,7 @@ public class PDFGenerator {
                     doc.setMargins(10, 0, 0, 0);
                 }
 
-                PDFUtils.addFirstPage(doc, pageHeight, pageWidth, titleTextInput, subtitleTextInput, theme);
+                PDFUtils.addFirstPage(doc, pageHeight, pageWidth, titleTextInput, subtitleTextInput, theme, presupuestoActivo);
 
                 int actualProductIndex = 1;
 

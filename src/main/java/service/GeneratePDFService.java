@@ -30,6 +30,7 @@ public class GeneratePDFService extends Service<Integer> {
     private final String subtitleTextInput;
 
     private final String selectedTheme;
+    private final boolean presupuestoActivo;
 
     // CONSTRUCTOR
     public GeneratePDFService(
@@ -54,7 +55,8 @@ public class GeneratePDFService extends Service<Integer> {
             int productoQuantity,
             String titleTextInput,
             String subtitleTextInput,
-            String selectedTheme
+            String selectedTheme,
+            boolean presupuestoActivo
             ) {
 
         // ASIGNO EL VALOR A CADA VARIABLE CON EL VALOR DE LAS VARIABLES QUE ENTRAN COMO
@@ -80,6 +82,7 @@ public class GeneratePDFService extends Service<Integer> {
         this.subtitleTextInput = subtitleTextInput;
 
         this.selectedTheme = selectedTheme;
+        this.presupuestoActivo = presupuestoActivo;
     }
 
     @Override // Task es asincronismo. Permite correr en segundo plano
@@ -91,7 +94,7 @@ public class GeneratePDFService extends Service<Integer> {
                 return PDFGenerator.generarPDF(archivoExcel, carpetaImagenes, archivoPdf, archivoDestino,
                         imageSize, pageWidth, pageHeight,
                         codigoColumn, productoColumn, precioColumn, unidadPorBultoColumn,
-                        imagenes, logTextArea, productoQuantity, titleTextInput, subtitleTextInput, selectedTheme);
+                        imagenes, logTextArea, productoQuantity, titleTextInput, subtitleTextInput, selectedTheme, presupuestoActivo);
             }
         };
     }

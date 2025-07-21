@@ -103,7 +103,7 @@ public class PDFUtils {
 
     // Funcion que agrega primer pagina del catalogo
     public static void addFirstPage(Document doc, float pageHeight, float pageWidth, String titleTextInput,
-            String subtitleTextInput, Theme theme)
+            String subtitleTextInput, Theme theme, boolean presupuestoActivo)
             throws Exception {
 
         if (titleTextInput == null || titleTextInput.trim().isEmpty()) {
@@ -148,7 +148,7 @@ public class PDFUtils {
 
         //DEBO AGREGAR LA PALABRA CLIENTE O CATALOGO SEGUN CORRESPONDA
         portada.add(logo);
-        portada.add(CardPortadaComponent.build(titulo, subtitulo));
+        portada.add(CardPortadaComponent.build(titulo, subtitulo, presupuestoActivo));
 
         doc.add(portada);
 

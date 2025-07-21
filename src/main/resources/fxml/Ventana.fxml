@@ -385,10 +385,19 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="addThemeButton" layoutX="215.0" layoutY="223.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="87.0" style="-fx-background-color: #444;">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
+      <Pane layoutX="212.0" layoutY="222.0" prefHeight="47.0" prefWidth="236.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">
+         <children>
+            <Label layoutX="30.0" layoutY="6.0" prefHeight="17.0" prefWidth="116.0" text="PRESUPUESTO" textFill="WHITE">
+               <font>
+                  <Font name="Arial Bold" size="15.0" />
+               </font>
+            </Label>
+            <CheckBox fx:id="presupuestoCheckBox" layoutX="4.0" layoutY="4.0" mnemonicParsing="false" onAction="#onClickPresupuestoCheckBox" prefHeight="0.0" prefWidth="26.0" selected="true" textFill="WHITE">
+               <font>
+                  <Font name="Roboto" size="15.0" />
+               </font>
+            </CheckBox>
+         </children>
+      </Pane>
    </children>
 </AnchorPane>
