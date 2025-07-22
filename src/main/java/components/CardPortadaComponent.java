@@ -21,7 +21,7 @@ public class CardPortadaComponent {
                 String textoSuperior;
                 if (presupuestoActivo) {
                         textoSuperior = "PRESUPUESTO";
-                }else{textoSuperior = "CLIENTE";}
+                }else{textoSuperior = "CATALOGO";}
 
                 return new Div()
                                 // .setHeight(100)
