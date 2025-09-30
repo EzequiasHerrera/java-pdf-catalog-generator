@@ -22,7 +22,7 @@
 <AnchorPane minHeight="503.0" minWidth="461.0" prefHeight="557.0" prefWidth="461.0" style="-fx-background-color: #242831;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fx.VentanaController">
    <children>
       
-      <ProgressIndicator fx:id="progressIndicator" layoutX="200.0" layoutY="525.0" prefHeight="30.0" prefWidth="30.0" progress="0.0" scaleX="15.0" scaleY="0.5" visible="false" />
+      <ProgressIndicator fx:id="progressIndicator" layoutX="400.0" layoutY="510.0" prefHeight="45.0" prefWidth="2.0" progress="0.0" scaleX="15.0" scaleY="0.5" visible="false" />
       <Pane layoutX="20.0" layoutY="272.0" prefHeight="74.0" prefWidth="428.0" AnchorPane.bottomAnchor="199.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="272.0">
          <children>
             <Pane layoutX="-2.0" layoutY="4.0" prefHeight="72.0" prefWidth="435.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;" />

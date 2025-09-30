@@ -35,6 +35,17 @@ public class DivComponent {
                     .setBackgroundColor(LIGHT_GRAY)
                     .setBorderRadius(new BorderRadius(6))
                     .setTextAlignment(TextAlignment.CENTER);
+        } else if (productsPerPage == 8) {
+            System.out.println(productsPerPage);
+            return new Div()
+                    .setPadding(5)
+                    .setPaddingTop(0)
+                    .setMargin(0)
+                    .setHeight(360)
+                    .setWidth(availableWidthSpace / 4)
+                    .setBorder(new SolidBorder(theme.cardBorderColor, 2.0f))
+                    .setBorderRadius(new BorderRadius(6))
+                    .setTextAlignment(TextAlignment.CENTER);
         } else if (productsPerPage == 12) {
             return new Div()
                     .setPadding(5)
