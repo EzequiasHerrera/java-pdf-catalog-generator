@@ -16,7 +16,7 @@ public class NombreComponent {
             String nombreValue = PDFUtils.safeText(PDFUtils.getCellValue(cell), "[SIN NOMBRE]");
 
             return new Paragraph(nombreValue)
-                    .setBold()
+                    .simulateBold()
                     .setFontSize(10)
                     .setFontColor(BLACK_COLOR)
                     .setMultipliedLeading(1f)
@@ -26,7 +26,7 @@ public class NombreComponent {
 
         } catch (Exception e) {
             return new Paragraph("[SIN NOMBRE]")
-                    .setBold()
+                    .simulateBold()
                     .setFontSize(10)
                     .setFontColor(BLACK_COLOR)
                     .setMultipliedLeading(1f)

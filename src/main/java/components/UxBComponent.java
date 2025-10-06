@@ -16,7 +16,7 @@ public class UxBComponent {
         try {
             String uxbText = PDFUtils.safeText(PDFUtils.getCellValue(cell), "--");
 
-            Text valorUxb = new Text(uxbText).setBold();
+            Text valorUxb = new Text(uxbText).simulateBold();
 
             return new Paragraph("UXB: ")
                     .add(valorUxb)

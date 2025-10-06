@@ -1,5 +1,28 @@
 package utils;
 
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.geom.Rectangle;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfPage;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEvent;
+import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler;
+import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.font.FontProvider;
+import com.itextpdf.layout.properties.HorizontalAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.VerticalAlignment;
+import com.itextpdf.styledxmlparser.resolver.font.BasicFontProvider;
+import components.CardPortadaComponent;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import themes.Theme;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -7,43 +30,21 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
-
-import com.itextpdf.io.image.ImageData;
-import com.itextpdf.kernel.colors.ColorConstants;
-import com.itextpdf.kernel.events.Event;
-import com.itextpdf.kernel.events.IEventHandler;
-import com.itextpdf.kernel.events.PdfDocumentEvent;
-import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.Rectangle;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.AreaBreak;
-import com.itextpdf.layout.element.Div;
-import com.itextpdf.layout.element.Image;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.font.FontProvider;
-import com.itextpdf.layout.properties.HorizontalAlignment;
-import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.VerticalAlignment;
-import com.itextpdf.styledxmlparser.resolver.font.BasicFontProvider;
-
-import components.CardPortadaComponent;
-import themes.Theme;
-
 public class PDFUtils {
 
     // Función que detecta si una fila está vacía
     public static boolean isEmptyRow(Row row) {
-        for (int i = row.getFirstCellNum(); i <= row.getLastCellNum(); i++) {
+        if (row == null) {
+            return true;
+        }
+        for (int i = row.getFirstCellNum(); i < row.getLastCellNum(); i++) {
             final org.apache.poi.ss.usermodel.Cell cell = row.getCell(i);
             if (cell != null && cell.getCellType() != CellType.BLANK) {
-                return false;
+                // Si es string, comprobar que no sea solo espacios
+                if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty()) {
+                    continue; // sigue buscando
+                }
+                return false; // hay contenido real
             }
         }
         return true;
@@ -103,8 +104,7 @@ public class PDFUtils {
 
     // Funcion que agrega primer pagina del catalogo
     public static void addFirstPage(Document doc, float pageHeight, float pageWidth, String titleTextInput,
-            String subtitleTextInput, Theme theme, boolean presupuestoActivo)
-            throws Exception {
+                                    String subtitleTextInput, Theme theme, boolean presupuestoActivo) throws Exception {
 
         if (titleTextInput == null || titleTextInput.trim().isEmpty()) {
             titleTextInput = "CATÁLOGO";
@@ -112,7 +112,7 @@ public class PDFUtils {
 
         Paragraph titulo = new Paragraph(titleTextInput)
                 .setFontSize(50)
-                .setBold()
+                .simulateBold()
                 .setFontColor(theme.titleTextColor)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setPaddingBottom(30)
@@ -121,7 +121,7 @@ public class PDFUtils {
 
         Paragraph subtitulo = new Paragraph(subtitleTextInput)
                 .setFontSize(25)
-                .setBold()
+                .simulateBold()
                 .setFontColor(theme.subtitleTextColor)
                 .setPadding(10)
                 .setTextAlignment(TextAlignment.CENTER);
@@ -156,19 +156,18 @@ public class PDFUtils {
         doc.add(new AreaBreak());
     }
 
-    public static void addPageNumber(PdfDocument pdfDoc, int pageNumber, float pageWidth, Theme theme) {
-        PdfPage page = pdfDoc.getPage(pageNumber);
-        PdfCanvas canvas = new PdfCanvas(page);
+    // MODIFICADO POR LEO
+    public static void addPageNumber(PdfDocument pdfDoc, PdfFont font, float fontSize, ImageData logoData, float y) {
+
+        int pageNumber = pdfDoc.getNumberOfPages();
+        final PdfPage page = pdfDoc.getPage(pageNumber);
+        float pWidth = page.getPageSize().getWidth();
+        float textX = pWidth / 2 + 15; // Dejo un poco de espacio para el logo a la izquierda
+        float logoX = pWidth / 2 - 40; // Logo a la izquierda del texto
+
+        final PdfCanvas canvas = new PdfCanvas(page);
 
         try {
-            var font = PdfFontFactory.createFont(); // Fuente por defecto
-
-            float fontSize = 10f;
-            float y = 20f; // margen inferior
-
-            float textX = pageWidth / 2 + 15; // Dejo un poco de espacio para el logo a la izquierda
-            float logoX = pageWidth / 2 - 40; // Logo a la izquierda del texto
-
             // Dibujar texto centrado, con pequeño desplazamiento hacia la derecha
             canvas.beginText()
                     .setFontAndSize(font, fontSize)
@@ -177,14 +176,11 @@ public class PDFUtils {
                     .showText("Página " + pageNumber)
                     .endText();
 
-            // Cargar logo desde recursos (classpath)
-            ImageData logoData = theme.logoImage;
-
             Rectangle rect = new Rectangle(logoX, y - 5, 30, 25); // ajustá el tamaño a gusto
             canvas.addImageFittedIntoRectangle(logoData, rect, false);
-
         } catch (Exception e) {
-            System.err.println("Error al dibujar número de página y logo: " + e.getMessage());
+//            System.err.println("Error al dibujar número de página y logo: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -199,8 +195,7 @@ public class PDFUtils {
     // Verifica si el Excel contiene las 4 columnas CODIGO PRODUCTO PRECIO UXB
     public static boolean isValidExcel(Row firstRow) throws Exception {
         if (firstRow == null || firstRow.getLastCellNum() < 4) {
-            throw new Exception(
-                    "Verifique que la hoja tenga los 4 encabezados en orden. Código, Nombre, Precio y Unidad por Bulto.");
+            throw new Exception("Verifique que la hoja tenga los 4 encabezados en orden. Código, Nombre, Precio y Unidad por Bulto.");
         }
         return true;
     }
@@ -214,16 +209,16 @@ public class PDFUtils {
             }
         }
 
-        log.append(rowCount);
+//        log.append(rowCount);
 
         return rowCount;
     }
 
     // Define el fondo del PDF
     public static void setPDFBackground(PdfDocument pdfDoc, ImageData portada, ImageData fondoGeneral) {
-        pdfDoc.addEventHandler(PdfDocumentEvent.START_PAGE, new IEventHandler() {
+        pdfDoc.addEventHandler(PdfDocumentEvent.START_PAGE, new AbstractPdfDocumentEventHandler() {
             @Override
-            public void handleEvent(Event event) {
+            protected void onAcceptedEvent(AbstractPdfDocumentEvent event) { // MODIFICADO PARA LA NUEVA VERSION
                 PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
                 PdfPage page = docEvent.getPage();
                 int pageNumber = pdfDoc.getPageNumber(page);
@@ -236,7 +231,6 @@ public class PDFUtils {
 
                 // Elegimos la imagen según el número de página
                 ImageData fondo = (pageNumber == 1) ? portada : fondoGeneral;
-
                 canvas.addImageFittedIntoRectangle(fondo, pageSize, false);
             }
         });
@@ -272,4 +266,5 @@ public class PDFUtils {
             return fallback;
         return text;
     }
+
 }

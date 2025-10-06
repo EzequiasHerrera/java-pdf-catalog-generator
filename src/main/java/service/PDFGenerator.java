@@ -1,35 +1,37 @@
 package service;
 
-import java.io.File;
-
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import com.itextpdf.io.image.ImageData;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
-
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
-
+import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Table;
-
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackageAccess;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import themes.KitchenToolsTheme;
 import themes.LineageTheme;
 import themes.Theme;
+import utils.FooterHandler;
 import utils.PDFUtils;
 
+import java.io.File;
+
 public class PDFGenerator {
+
     public static int generarPDF(
             File archivoExcel,
             File carpetaImagenes,
-            File archivoPdf,
+            File archivoCaratulaPdf,
             File archivoDestino,
 
             float imageSize,
@@ -42,105 +44,110 @@ public class PDFGenerator {
             boolean unidadPorBultoColumn,
 
             boolean imagenes,
+
             TextArea logTextArea,
             int productoQuantity,
             String titleTextInput,
             String subtitleTextInput,
-            String selectedTheme, boolean presupuestoActivo) throws Exception {
+            String selectedTheme,
+            boolean presupuestoActivo) throws Exception {
 
+        int totalProducts = 0;
         final int productsPerPage = productoQuantity; // CANTIDAD DE PRODUCTOS QUE QUIERO POR PAGINA
         final StringBuilder log = new StringBuilder();
-
-        final Theme theme = (selectedTheme.equals("lineage"))
-                ? LineageTheme.getTheme()
-                : KitchenToolsTheme.getTheme();
+        final Theme theme = (selectedTheme.equalsIgnoreCase(KitchenToolsTheme.THEME_NAME)) ? KitchenToolsTheme.getTheme() : LineageTheme.getTheme();
 
         // IMAGENES CARGADAS SEGUN EL THEME
         final ImageData backgroundFirstPageImg = theme.backgroundFirstPageImage;
         final ImageData backgroundImg = theme.backgroundImage;
 
-        try (
-                // EXCEL ----------------------------------------------
-                final OPCPackage pkg = OPCPackage.open(archivoExcel);
-                final XSSFWorkbook workbook = new XSSFWorkbook(pkg)) {
+        try ( // EXCEL ----------------------------------------------
+              final OPCPackage pkg = OPCPackage.open(archivoExcel, PackageAccess.READ);
+              final XSSFWorkbook workbook = new XSSFWorkbook(pkg)) {
 
             final Sheet sheet = workbook.getSheetAt(0);
             final Row excelColumns = sheet.getRow(0);
-            int totalProducts = PDFUtils.countRowsInFile(sheet, log); // 82 productos
+            totalProducts = PDFUtils.countRowsInFile(sheet, log);
             // EXCEL ----------------------------------------------
 
-            PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
-            PdfDocument pdfDoc = new PdfDocument(writer);
-            Document doc = new Document(pdfDoc, PageSize.A4);
+            try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
+                 final PdfDocument pdfDoc = new PdfDocument(writer);
+                 final Document doc = new Document(pdfDoc, PageSize.A4)) {
 
-            if (PDFUtils.isValidExcel(excelColumns)) {
+                final PdfFont font = PdfFontFactory.createFont(); // Fuente por defecto
+                final ImageData logoData = theme.logoImage; // Cargar logo desde recursos (classpath)
+                final float fontSize = 10f; // tamaño de fuente para el pie de página
+                final float y = 20f; // margen inferior
 
-                PDFUtils.setPDFBackground(pdfDoc, backgroundFirstPageImg, backgroundImg);
+                pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new FooterHandler(font, logoData, fontSize, y)); // Agregar pie de página a cada página
 
-                if (productsPerPage <= 12) {
-                    doc.setMargins(10, 10, 10, 10);
-                } else {
-                    doc.setMargins(10, 0, 0, 0);
-                }
+                if (PDFUtils.isValidExcel(excelColumns)) {
 
-                PDFUtils.addFirstPage(doc, pageHeight, pageWidth, titleTextInput, subtitleTextInput, theme, presupuestoActivo);
+                    PDFUtils.setPDFBackground(pdfDoc, backgroundFirstPageImg, backgroundImg);
 
-                int actualProductIndex = 1;
+                    if (productsPerPage <= 12) {
+                        doc.setMargins(10, 10, 10, 10);
+                    } else {
+                        doc.setMargins(10, 0, 0, 0);
+                    }
 
-                while (actualProductIndex <= totalProducts) {
+                    PDFUtils.addFirstPage(doc, pageHeight, pageWidth, titleTextInput, subtitleTextInput, theme, presupuestoActivo);
 
-                    // 🧱 Nueva tabla por página
-                    // Diferencio entre 2, 3 y 5 columnas
-                    Table table = TableBuilder.createConfiguredTable(pageHeight, productsPerPage);
+                    int actualProductIndex = 1;
 
-                    int itemsThisPage = 0;
+                    while (actualProductIndex <= totalProducts) {
+                        // 🧱 Nueva tabla por página
+                        // Diferencio entre 2, 3 y 5 columnas
+                        final Table table = TableBuilder.createConfiguredTable(pageHeight, productsPerPage);
 
-                    // 🧠 Cargo hasta X productos POR PAGINA o hasta que no queden más
-                    while (itemsThisPage < productsPerPage && actualProductIndex <= totalProducts) {
+                        int itemsThisPage = 0;
 
-                        Row row = sheet.getRow(actualProductIndex);
-                        if (row == null || row.getCell(0) == null || PDFUtils.getCellValue(row.getCell(0)).isBlank()) {
+                        // 🧠 Cargo hasta X productos POR PAGINA o hasta que no queden más
+                        while (itemsThisPage < productsPerPage && actualProductIndex <= totalProducts) {
+
+                            final Row row = sheet.getRow(actualProductIndex);
+                            if (PDFUtils.isEmptyRow(row)) {
+                                actualProductIndex++;
+                                continue;
+                            }
+
+                            // VUELTA PAR O IMPAR (para saber si va a la izquierda o derecha)
+                            boolean esPar = itemsThisPage % 2 == 0;
+
+                            final Cell container = CellBuilder.createTest(
+                                    sheet,
+                                    actualProductIndex,
+                                    codigoColumn,
+                                    productoColumn,
+                                    precioColumn,
+                                    unidadPorBultoColumn,
+                                    imagenes,
+                                    carpetaImagenes,
+                                    imageSize,
+                                    pageWidth,
+                                    pageHeight,
+                                    itemsThisPage,
+                                    log, productsPerPage, esPar, theme);
+
+                            table.addCell(container);
+
                             actualProductIndex++;
-                            continue;
+                            itemsThisPage++;
                         }
 
-                        // VUELTA PAR O IMPAR (para saber si va a la izquierda o derecha)
-                        boolean esPar = itemsThisPage % 2 == 0;
+                        // 📄 Agrego tabla con hasta 12 productos
+                        doc.add(table);
+//                    PDFUtils.addPageNumber(pdfDoc, font, fontSize, logoData, y); // Cambiado por FooterHandler
 
-                        Cell container = CellBuilder.createTest(
-                                sheet,
-                                actualProductIndex,
-                                codigoColumn,
-                                productoColumn,
-                                precioColumn,
-                                unidadPorBultoColumn,
-                                imagenes,
-                                carpetaImagenes,
-                                imageSize,
-                                pageWidth,
-                                pageHeight,
-                                itemsThisPage,
-                                log, productsPerPage, esPar, theme);
-
-                        table.addCell(container);
-
-                        actualProductIndex++;
-                        itemsThisPage++;
-                    }
-
-                    // 📄 Agrego tabla con hasta 12 productos
-
-                    doc.add(table);
-                    PDFUtils.addPageNumber(pdfDoc, pdfDoc.getNumberOfPages(), pageWidth, theme);
-
-                    // ↪️ Si quedan productos, salto de página
-                    if (actualProductIndex <= totalProducts) {
-                        doc.add(new AreaBreak());
+                        // ↪️ Si quedan productos, salto de página
+                        if (actualProductIndex <= totalProducts) {
+                            doc.add(new AreaBreak());
+                        }
                     }
 
                 }
-
-                doc.close();
+            } catch (Exception e) {
+                throw e;
             }
         } catch (Exception e) {
             throw e;
@@ -148,10 +155,12 @@ public class PDFGenerator {
 
         if (log.length() > 0) {
             Platform.runLater(() -> {
-                logTextArea.setStyle("-fx-text-fill: #d3d700;");
-                logTextArea.appendText(log.toString());
+                if (logTextArea != null) {
+                    logTextArea.setStyle("-fx-text-fill: #d3d700;");
+                    logTextArea.appendText(log.toString());
+                }
             });
         }
-        return 0;
+        return totalProducts - 1; // Resto 1 para no contar la fila de encabezados
     }
 }

@@ -8,6 +8,9 @@ import com.itextpdf.kernel.colors.DeviceRgb;
 import utils.PDFUtils;
 
 public class LineageTheme {
+
+    public static final String THEME_NAME = "LINEA GE";
+
     public static Theme getTheme() throws MalformedURLException {
         return new Theme(
                 new DeviceRgb(66, 67, 154), // Title text

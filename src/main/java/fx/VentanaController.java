@@ -12,6 +12,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.log4j.BasicConfigurator;
 import service.GeneratePDFService;
+import themes.KitchenToolsTheme;
+import themes.LineageTheme;
 
 import java.io.File;
 import java.net.URL;
@@ -88,7 +90,7 @@ public class VentanaController implements Initializable {
     @FXML
     private Button kitchenButton;
 
-    private String selectedTheme = "lineage";
+    private String selectedTheme = LineageTheme.THEME_NAME;
 
     @FXML
     private CheckBox imagenCheckBox;
@@ -168,7 +170,7 @@ public class VentanaController implements Initializable {
 
         carpetaImagenes = new File("Z:\\Doc. Compartidos\\DUX ERP Linea GE\\IMAGENES (subidas a la Web)");
 
-        if (carpetaImagenes != null && carpetaImagenes.isDirectory()) {
+        if (carpetaImagenes.isDirectory()) {
             ubicacionImagenes.setText(carpetaImagenes.getAbsolutePath());
         }
 
@@ -324,11 +326,11 @@ public class VentanaController implements Initializable {
         Object source = event.getSource();
 
         if (source == lineageButton) {
-            selectedTheme = "lineage";
+            selectedTheme = LineageTheme.THEME_NAME;
             lineageButton.setStyle("-fx-background-color: #fff;");
             kitchenButton.setStyle("-fx-background-color: #444;");
         } else if (source == kitchenButton) {
-            selectedTheme = "kitchen";
+            selectedTheme = KitchenToolsTheme.THEME_NAME;
             kitchenButton.setStyle("-fx-background-color: #fff;");
             lineageButton.setStyle("-fx-background-color: #444;");
         }
@@ -425,7 +427,7 @@ public class VentanaController implements Initializable {
                     service.setOnSucceeded(e -> {
                         successSound.play();
                         logTextArea.setStyle("-fx-text-fill: darkgreen;");
-                        logTextArea.appendText(" productos han sido generados.\n");
+                        logTextArea.appendText(service.getValue() + " productos han sido generados.\n");
                         logTextArea
                                 .appendText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss"))
                                         + ": \"" + archivoDestino.getAbsolutePath() + "\" generado.\n");

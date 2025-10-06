@@ -16,10 +16,10 @@ public class PrecioComponent {
             String precioText = PDFUtils.safeText(PDFUtils.getCellValue(cell), "--");
             String precioValue = PDFUtils.formatPrice(precioText);
 
-            Text precioBold = new Text("$" + precioValue).setBold();
+            Text precioBold = new Text("$" + precioValue).simulateBold();
 
             return new Paragraph("PRECIO: \n")
-            .add(precioBold)
+                    .add(precioBold)
                     .setFontSize(10)
                     .setFontColor(BLACK_COLOR)
                     .setMultipliedLeading(1f)
@@ -28,7 +28,7 @@ public class PrecioComponent {
                     .setMargin(0);
 
         } catch (Exception e) {
-            Text precioBold = new Text("$--").setBold();
+            Text precioBold = new Text("$--").simulateBold();
 
             return new Paragraph("PRECIO: \n")
                     .add(precioBold)

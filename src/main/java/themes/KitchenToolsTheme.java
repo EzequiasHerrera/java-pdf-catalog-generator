@@ -8,6 +8,9 @@ import com.itextpdf.kernel.colors.DeviceRgb;
 import utils.PDFUtils;
 
 public class KitchenToolsTheme {
+
+    public static final String THEME_NAME = "KT";
+
     public static Theme getTheme() throws MalformedURLException {
         return new Theme(
                 new DeviceRgb(255, 134, 28), // Title text

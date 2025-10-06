@@ -19,7 +19,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/Ventana.fxml"));
 
         //Definimos el titulo de la ventana
-        primaryStage.setTitle("Catalogo");
+        primaryStage.setTitle("Catálogo generator");
 
         //Definimos ICONO de logo de aplicación y lo seteamos
         final Image icon = new Image(getClass().getResource("/images/logoapp.png").toExternalForm());

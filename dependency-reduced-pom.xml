@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.empresa.crankycode</groupId>
-  <artifactId>catalog-generator</artifactId>
-  <version>2.0</version>
+  <artifactId>catalog-generator-automated</artifactId>
+  <version>2.1</version>
   <build>
     <plugins>
       <plugin>
@@ -16,9 +16,10 @@
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.3</version>
+        <version>3.6.1</version>
         <executions>
           <execution>
+            <phase>package</phase>
             <goals>
               <goal>shade</goal>
             </goals>
@@ -39,15 +40,15 @@
     <dependency>
       <groupId>com.itextpdf</groupId>
       <artifactId>itext-core</artifactId>
-      <version>8.0.2</version>
+      <version>9.3.0</version>
       <type>pom</type>
       <scope>compile</scope>
     </dependency>
   </dependencies>
   <properties>
-    <maven.compiler.release>20</maven.compiler.release>
-    <maven.compiler.target>20</maven.compiler.target>
+    <maven.compiler.release>25</maven.compiler.release>
+    <maven.compiler.target>25</maven.compiler.target>
     <encoding>UTF-8</encoding>
-    <maven.compiler.source>20</maven.compiler.source>
+    <maven.compiler.source>25</maven.compiler.source>
   </properties>
 </project>

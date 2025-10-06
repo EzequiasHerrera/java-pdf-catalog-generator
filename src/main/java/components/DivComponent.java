@@ -24,7 +24,7 @@ public class DivComponent {
                     .setBackgroundColor(LIGHT_GRAY)
                     .setBorderRadius(new BorderRadius(6))
                     .setTextAlignment(TextAlignment.CENTER) // ESTO ALINEA EL TEXTO DENTRO DE CADA CONTENEDOR DE TEXTO Y
-                                                            // NO DENTRO DE LA CARD
+                    // NO DENTRO DE LA CARD
                     .setVerticalAlignment(VerticalAlignment.MIDDLE); // ESTO ALINEA EL CONTENIDO DENTRO DE LA CARD
         } else if (productsPerPage == 4) {
             return new Div()
@@ -33,6 +33,17 @@ public class DivComponent {
                     .setHeight(100)
                     .setWidth(availableWidthSpace / 2)
                     .setBackgroundColor(LIGHT_GRAY)
+                    .setBorderRadius(new BorderRadius(6))
+                    .setTextAlignment(TextAlignment.CENTER);
+        } else if (productsPerPage == 8) {
+            System.out.println(productsPerPage);
+            return new Div()
+                    .setPadding(5)
+                    .setPaddingTop(0)
+                    .setMargin(0)
+                    .setHeight(360)
+                    .setWidth(availableWidthSpace / 4)
+                    .setBorder(new SolidBorder(theme.cardBorderColor, 2.0f))
                     .setBorderRadius(new BorderRadius(6))
                     .setTextAlignment(TextAlignment.CENTER);
         } else if (productsPerPage == 12) {
