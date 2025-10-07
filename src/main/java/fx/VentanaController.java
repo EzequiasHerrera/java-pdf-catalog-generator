@@ -156,7 +156,7 @@ public class VentanaController implements Initializable {
         ubicacionImagenes.setTooltip(new Tooltip("Formatos de las imágenes: .jpg, .jpeg, .png y .bmp"));
 
         sheetSizeComboBox.getItems().addAll("A4", "A3", "Carta");
-        productoQuantityComboBox.getItems().addAll(2, 4, 12, 20);
+        productoQuantityComboBox.getItems().addAll(ProductQuantity.TWO.getQuantity(), ProductQuantity.FOUR.getQuantity(), ProductQuantity.TWELVE.getQuantity(), ProductQuantity.TWENTY.getQuantity());
 
         errorSound = new AudioClip(getClass().getResource("/audios/error.mp3").toExternalForm());
         successSound = new AudioClip(getClass().getResource("/audios/success.mp3").toExternalForm());
@@ -341,7 +341,7 @@ public class VentanaController implements Initializable {
         Preferences prefs = Preferences.userRoot().node("catalogo");
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Elige archivo .XLSX");
+        fileChooser.setTitle("Elige archivo .xlsx");
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Archivo XLSX", "*.xlsx"));
 
