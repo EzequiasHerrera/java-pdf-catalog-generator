@@ -63,8 +63,6 @@ public class VentanaController implements Initializable {
     private TextField pageWidthTextInput;
     @FXML
     private TextField pageHeightTextInput;
-    // @FXML
-    // private TextField productoQuantityTextInput;
     @FXML
     private ComboBox<Integer> productoQuantityComboBox;
 
@@ -137,6 +135,9 @@ public class VentanaController implements Initializable {
         BasicConfigurator.configure(); // configure Log4j
         inicializarComponentes();
         Main.stage.setOnCloseRequest(event -> savePreferences());
+    }
+
+    private void inicializarComponentes() {
 
         productoQuantityComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal == null)
@@ -149,10 +150,6 @@ public class VentanaController implements Initializable {
             }
         });
 
-    }
-
-    private void inicializarComponentes() {
-        ubicacionExcel.setTooltip(new Tooltip("La 1º hoja debe contener los 7 encabezados en orden."));
         ubicacionImagenes.setTooltip(new Tooltip("Formatos de las imágenes: .jpg, .jpeg, .png y .bmp"));
 
         sheetSizeComboBox.getItems().addAll("A4", "A3", "Carta");
@@ -182,8 +179,6 @@ public class VentanaController implements Initializable {
         precioFontSize.setText(prefs.get("precioFontSize", "7"));
         unidadPorBultoFontSize.setText(prefs.get("unidadPorBultoFontSize", "6"));
         productoQuantityComboBox.setValue(prefs.getInt("productoQuantityTextInput", 12));
-        // productoQuantityTextInput.setText(prefs.get("productoQuantityTextInput",
-        // "8"));
         presupuestoCheckBox.setSelected(prefs.getBoolean("presupuestoCheckBox", false));
         presupuestoActivo = presupuestoCheckBox.isSelected(); // Actualiza el valor
 
@@ -236,8 +231,13 @@ public class VentanaController implements Initializable {
         pageWidthTextInput.setText(prefs.get("pageWidthTextInput", "595"));
         pageHeightTextInput.setText(prefs.get("pageHeightTextInput", "842"));
 
+        selectedTheme = prefs.get("selectedTheme", LineageTheme.THEME_NAME);
+        changeButtonStyles(selectedTheme);
+
         // -------------------INHABILITAR OPCIONES AL
         // DESTILDAR-------------------------------------//
+        presupuestoCheckBox.setSelected(prefs.getBoolean("presupuestoCheckBox", false));
+
         codigoCheckBox.setSelected(prefs.getBoolean("codigoCheckBox", true));
         if (!codigoCheckBox.isSelected()) {
             codigoFontSize.setDisable(true);
@@ -275,7 +275,6 @@ public class VentanaController implements Initializable {
         // -----------------------------------------------------------//
         System.out.println("Excel: " + (archivoExcel != null ? archivoExcel.getAbsolutePath() : "null"));
         System.out.println("Imágenes: " + (carpetaImagenes != null ? carpetaImagenes.getAbsolutePath() : "null"));
-
     }
 
     private void savePreferences() {
@@ -309,6 +308,10 @@ public class VentanaController implements Initializable {
         prefs.put("pageWidthTextInput", pageWidthTextInput.getText());
         prefs.put("pageHeightTextInput", pageHeightTextInput.getText());
 
+        prefs.put("selectedTheme", selectedTheme.equals(LineageTheme.THEME_NAME) ? LineageTheme.THEME_NAME : KitchenToolsTheme.THEME_NAME);
+
+        prefs.putBoolean("presupuestoCheckBox", presupuestoCheckBox.isSelected());
+
         prefs.putBoolean("codigoCheckBox", codigoCheckBox.isSelected());
         prefs.putBoolean("productoCheckBox", productoCheckBox.isSelected());
         prefs.putBoolean("precioCheckBox", precioCheckBox.isSelected());
@@ -321,17 +324,20 @@ public class VentanaController implements Initializable {
     public void onClickTheme(ActionEvent event) {
         Object source = event.getSource();
 
-        if (source == lineageButton) {
-            selectedTheme = LineageTheme.THEME_NAME;
-            lineageButton.setStyle("-fx-background-color: #fff;");
-            kitchenButton.setStyle("-fx-background-color: #444;");
-        } else if (source == kitchenButton) {
-            selectedTheme = KitchenToolsTheme.THEME_NAME;
-            kitchenButton.setStyle("-fx-background-color: #fff;");
-            lineageButton.setStyle("-fx-background-color: #444;");
-        }
+        selectedTheme = (source == lineageButton) ? LineageTheme.THEME_NAME : KitchenToolsTheme.THEME_NAME;
+        changeButtonStyles(selectedTheme);
 
         System.out.println("Tema seleccionado: " + selectedTheme);
+    }
+
+    private void changeButtonStyles(String selectedTheme) {
+        if (selectedTheme.equals(LineageTheme.THEME_NAME)) {
+            lineageButton.setStyle("-fx-background-color: #fff;-fx-border-color: #1E88E5; -fx-border-width: 3;");
+            kitchenButton.setStyle("-fx-background-color: #444;-fx-border-color: transparent; -fx-border-width: 0;");
+        } else {
+            kitchenButton.setStyle("-fx-background-color: #fff;-fx-border-color: #1E88E5; -fx-border-width: 3;");
+            lineageButton.setStyle("-fx-background-color: #444;-fx-border-color: transparent; -fx-border-width: 0;");
+        }
     }
 
     @FXML
@@ -525,7 +531,6 @@ public class VentanaController implements Initializable {
                 pageHeightTextInput.setText("792");
                 break;
         }
-
     }
     // ---------------------VALIDACIONES ETC-------------------------------//
 
@@ -564,8 +569,6 @@ public class VentanaController implements Initializable {
                 && isNumeric(productoFontSize.getText())
                 && isNumeric(precioFontSize.getText())
                 && isNumeric(unidadPorBultoFontSize.getText())
-                // && isNumeric(productoQuantityTextInput.getText())
-
                 && isNumeric(imageSizeTextInput.getText())
                 && isNumeric(pageWidthTextInput.getText())
                 && isNumeric(pageHeightTextInput.getText());
