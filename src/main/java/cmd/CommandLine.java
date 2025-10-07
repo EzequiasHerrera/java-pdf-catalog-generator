@@ -15,6 +15,7 @@ import service.PDFGenerator;
 import themes.KitchenToolsTheme;
 import themes.LineageTheme;
 import utils.PDFUtils;
+import utils.ProductQuantity;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,20 +42,19 @@ public class CommandLine {
     private File carpetaDestinoKT; // Directorio donde guardar NUEVO PDF
     private File carpetaDestinoLGE; // Directorio donde guardar NUEVO PDF
 
+    private String pageWidthTextInput;
+    private String pageHeightTextInput;
     private boolean codigoCheckBox; // CODIGO
     private boolean productoCheckBox; // NOMBRE
     private boolean precioCheckBox; // PRECIO
     private boolean unidadPorBultoCheckBox; // UXB
     private boolean imagenCheckBox; // IMAGEN
 
-    private String pageWidthTextInput;
-    private String pageHeightTextInput;
-
     public static void main(String[] args) {
         try {
             Configurator.setLevel("com.itextpdf", org.apache.logging.log4j.Level.ERROR); // Suprime logs de iText
             CommandLine app = new CommandLine();
-            System.out.println(app.dtf.format(LocalDateTime.now()) + ": Catálogo PDF Generator iniciado.");
+            System.out.println(app.dtf.format(LocalDateTime.now()) + ": Catálogo PDF Generator iniciado(consola).");
             app.loadDefaultValues();
             final List<HashMap<String, Object>> parametros = app.obtenerParametros();
             if (!parametros.isEmpty()) {
@@ -81,7 +81,6 @@ public class CommandLine {
     }
 
     private void loadDefaultValues() {
-//        logTextArea = new StringBuilder();
         pageWidthTextInput = "595";
         pageHeightTextInput = "842";
         codigoCheckBox = true;
@@ -114,10 +113,10 @@ public class CommandLine {
 
             System.out.println("------------------------------------------------------------------------------------------------------------------");
             System.out.println(dtf.format(LocalDateTime.now()) + ": Ubicaciones cargadas:"
+                    + "\n-Archivo Super Master: " + archivoMasterExcel.getAbsolutePath()
                     + "\n-Imágenes: " + carpetaImagenes.getAbsolutePath()
                     + "\n-Destino KT: " + carpetaDestinoKT.getAbsolutePath()
-                    + "\n-Destino LGE: " + carpetaDestinoLGE.getAbsolutePath()
-                    + "\n-Archivo Super Master: " + archivoMasterExcel.getAbsolutePath());
+                    + "\n-Destino LGE: " + carpetaDestinoLGE.getAbsolutePath());
 
             if (validarUbicaciones()) {
                 // PARAMETROS
@@ -140,13 +139,7 @@ public class CommandLine {
                     String subtitleTextInput = formatter.format(LocalDate.now()); // Fecha actual
 
                     // SETEAR TAMAÑO DE IMAGEN DEPENDIENDO LA CANTIDAD DE PRODUCTOS
-                    final String imageSizeTextInput = switch (productoQuantityComboBox) {
-                        case 2 -> "380";
-                        case 4 -> "190";
-                        case 12 -> "90";
-                        case 20 -> "60";
-                        default -> throw new Exception("La cantidad de productos debe ser 2/4/12/20.");
-                    };
+                    final String imageSizeTextInput = ProductQuantity.fromQuantity(productoQuantityComboBox).getImageSize();
 
                     System.out.println("------------------------------------------------------------------------------------------------------------------");
                     System.out.println(dtf.format(LocalDateTime.now()) + ": Parámetros cargados:"
@@ -192,8 +185,8 @@ public class CommandLine {
         try {
             xl = new ActiveXComponent("Excel.Application");
             xl.setProperty("Visible", false);
-            Dispatch.put(xl, "DisplayAlerts", false);
-            Dispatch.put(xl, "EnableEvents", false);
+            Dispatch.put(xl, "DisplayAlerts", false); // Desactivar alertas
+            Dispatch.put(xl, "EnableEvents", false); // Desactivar eventos
 
             Dispatch workbooks = xl.getProperty("Workbooks").toDispatch();
             Dispatch original = Dispatch.call(workbooks, "Open", archivoMasterExcel.getAbsolutePath()).toDispatch();

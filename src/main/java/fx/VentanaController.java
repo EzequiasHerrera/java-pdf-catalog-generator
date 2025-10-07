@@ -14,6 +14,7 @@ import org.apache.log4j.BasicConfigurator;
 import service.GeneratePDFService;
 import themes.KitchenToolsTheme;
 import themes.LineageTheme;
+import utils.ProductQuantity;
 
 import java.io.File;
 import java.net.URL;
@@ -140,16 +141,12 @@ public class VentanaController implements Initializable {
         productoQuantityComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal == null)
                 return;
-
-            String imageSize = switch (newVal) {
-                case 2 -> "380";
-                case 4 -> "190";
-                case 12 -> "90";
-                case 20 -> "60";
-                default -> "";
-            };
-
-            imageSizeTextInput.setText(imageSize);
+            try {
+                final String imageSize = ProductQuantity.fromQuantity(newVal).getImageSize();
+                imageSizeTextInput.setText(imageSize);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         });
 
     }
@@ -158,7 +155,6 @@ public class VentanaController implements Initializable {
         ubicacionExcel.setTooltip(new Tooltip("La 1º hoja debe contener los 7 encabezados en orden."));
         ubicacionImagenes.setTooltip(new Tooltip("Formatos de las imágenes: .jpg, .jpeg, .png y .bmp"));
 
-        // Populate the ChoiceBox with font families
         sheetSizeComboBox.getItems().addAll("A4", "A3", "Carta");
         productoQuantityComboBox.getItems().addAll(2, 4, 12, 20);
 
@@ -236,7 +232,7 @@ public class VentanaController implements Initializable {
         // FUENTE-------------------------------//
         sheetSizeComboBox.setValue(prefs.get("sheetSize", "A4"));
 
-        imageSizeTextInput.setText(prefs.get("imageSizeTextInput", "83"));
+        imageSizeTextInput.setText(prefs.get("imageSizeTextInput", ProductQuantity.TWO.getImageSize()));
         pageWidthTextInput.setText(prefs.get("pageWidthTextInput", "595"));
         pageHeightTextInput.setText(prefs.get("pageHeightTextInput", "842"));
 

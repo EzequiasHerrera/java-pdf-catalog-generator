@@ -153,14 +153,13 @@ public class PDFGenerator {
             throw e;
         }
 
-        if (log.length() > 0) {
+        if (logTextArea != null && log.length() > 0) {
             Platform.runLater(() -> {
-                if (logTextArea != null) {
-                    logTextArea.setStyle("-fx-text-fill: #d3d700;");
-                    logTextArea.appendText(log.toString());
-                }
+                logTextArea.setStyle("-fx-text-fill: #d3d700;");
+                logTextArea.appendText(log.toString());
             });
         }
         return totalProducts - 1; // Resto 1 para no contar la fila de encabezados
     }
+
 }
