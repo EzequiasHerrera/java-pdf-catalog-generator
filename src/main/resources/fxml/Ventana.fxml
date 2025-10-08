@@ -227,7 +227,7 @@
       
                         <Button fx:id="generarButton" alignment="CENTER" layoutX="135.0" layoutY="514.0" mnemonicParsing="false" onAction="#generarCatalogo" prefHeight="30.0" prefWidth="198.0" style="-fx-background-color: #514398; -fx-background-radius: 5;" text="Generar PDF" textAlignment="CENTER" textFill="WHITE" wrapText="true">
          <font>
-            <Font name="System Bold" size="15.0" />
+            <Font name="Rockwell Bold" size="17.0" />
          </font>
          <opaqueInsets>
             <Insets />

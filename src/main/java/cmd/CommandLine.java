@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-// Clase principal para ejecutar desde línea de comandos: java -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED -jar catalog-generator-automated-2.1-shaded.jar
+// Clase principal cuando se ejecuta desde línea de comandos
 public class CommandLine {
 
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
@@ -296,7 +296,7 @@ public class CommandLine {
         }
     }
 
-//    public void deletePdfs(Path folder) throws IOException {
+//    private void deletePdfs(Path folder) throws IOException {
 //        System.out.println("Eliminando archivos PDF de: " + folder.toString());
 //        try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder, "*.pdf")) {
 //            for (Path entry : stream) {
