@@ -12,8 +12,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import service.PDFGenerator;
-import themes.KitchenToolsTheme;
-import themes.LineageTheme;
 import utils.PDFUtils;
 import utils.ProductQuantity;
 
@@ -38,12 +36,10 @@ public class CommandLine {
 
     private File carpetaImagenes; // Directorio donde encontrar las imagenes
     private File archivoMasterExcel; // Archivo SUPER MASTER Excel
-    private File archivoCaratulaPdf; // Archivo carátula PDF
-    private File carpetaDestinoKT; // Directorio donde guardar NUEVO PDF
-    private File carpetaDestinoLGE; // Directorio donde guardar NUEVO PDF
 
     private String pageWidthTextInput;
     private String pageHeightTextInput;
+
     private boolean codigoCheckBox; // CODIGO
     private boolean productoCheckBox; // NOMBRE
     private boolean precioCheckBox; // PRECIO
@@ -81,8 +77,8 @@ public class CommandLine {
     }
 
     private void loadDefaultValues() {
-        pageWidthTextInput = "595";
-        pageHeightTextInput = "842";
+        pageWidthTextInput = "595"; // A4 width
+        pageHeightTextInput = "842"; // A4 height
         codigoCheckBox = true;
         productoCheckBox = true;
         precioCheckBox = true;
@@ -108,15 +104,11 @@ public class CommandLine {
 
             archivoMasterExcel = Paths.get(PDFUtils.getCellValue(row.getCell(0))).toFile(); // A
             carpetaImagenes = Paths.get(PDFUtils.getCellValue(row.getCell(1))).toFile(); // B
-            carpetaDestinoKT = Paths.get(PDFUtils.getCellValue(row.getCell(2))).toFile(); // C
-            carpetaDestinoLGE = Paths.get(PDFUtils.getCellValue(row.getCell(3))).toFile(); // D
 
             System.out.println("------------------------------------------------------------------------------------------------------------------");
             System.out.println(dtf.format(LocalDateTime.now()) + ": Ubicaciones cargadas:"
                     + "\n-Archivo Super Master: " + archivoMasterExcel.getAbsolutePath()
-                    + "\n-Imágenes: " + carpetaImagenes.getAbsolutePath()
-                    + "\n-Destino KT: " + carpetaDestinoKT.getAbsolutePath()
-                    + "\n-Destino LGE: " + carpetaDestinoLGE.getAbsolutePath());
+                    + "\n-Imágenes: " + carpetaImagenes.getAbsolutePath());
 
             if (validarUbicaciones()) {
                 // PARAMETROS
@@ -132,14 +124,30 @@ public class CommandLine {
                     String listaPrecios = PDFUtils.getCellValue(row.getCell(0)); //
                     String mixProductos = PDFUtils.getCellValue(row.getCell(1)); //
                     String clasificacion = PDFUtils.getCellValue(row.getCell(2)); //
-                    String titleTextInput = PDFUtils.getCellValue(row.getCell(3)); //
-                    String selectedTheme = PDFUtils.getCellValue(row.getCell(4)); //
-                    boolean presupuestoCheckBox = PDFUtils.getCellValue(row.getCell(5)).equalsIgnoreCase("PRESUPUESTO"); //
-                    int productoQuantityComboBox = (int) Double.parseDouble(PDFUtils.getCellValue(row.getCell(6))); //
+                    boolean caratula = PDFUtils.getCellValue(row.getCell(3)).equalsIgnoreCase("SI"); //
+                    String titleTextInput = PDFUtils.getCellValue(row.getCell(4)); //
+                    String selectedTheme = PDFUtils.getCellValue(row.getCell(5)); //
+                    boolean presupuestoCheckBox = PDFUtils.getCellValue(row.getCell(6)).equalsIgnoreCase("PRESUPUESTO"); //
+                    int productoQuantityComboBox = (int) Double.parseDouble(PDFUtils.getCellValue(row.getCell(7))); //
                     String subtitleTextInput = formatter.format(LocalDate.now()); // Fecha actual
+                    String carpetaDestino = PDFUtils.getCellValue(row.getCell(8)); //
 
                     // SETEAR TAMAÑO DE IMAGEN DEPENDIENDO LA CANTIDAD DE PRODUCTOS
                     final String imageSizeTextInput = ProductQuantity.fromQuantity(productoQuantityComboBox).getImageSize();
+                    // GUARDAR FILA EN LISTA DE PARAMETROS
+                    final HashMap<String, Object> fila = new HashMap<>();
+                    fila.put("listaPrecios", listaPrecios);
+                    fila.put("mixProductos", mixProductos);
+                    fila.put("clasificacion", clasificacion);
+                    fila.put("caratula", caratula);
+                    fila.put("selectedTheme", selectedTheme);
+                    fila.put("productoQuantityComboBox", productoQuantityComboBox);
+                    fila.put("imageSizeTextInput", imageSizeTextInput);
+                    fila.put("presupuestoCheckBox", presupuestoCheckBox);
+                    fila.put("titleTextInput", titleTextInput);
+                    fila.put("subtitleTextInput", subtitleTextInput);
+                    fila.put("carpetaDestino", carpetaDestino);
+                    parametros.add(fila);
 
                     System.out.println("------------------------------------------------------------------------------------------------------------------");
                     System.out.println(dtf.format(LocalDateTime.now()) + ": Parámetros cargados:"
@@ -149,21 +157,10 @@ public class CommandLine {
                             + "\n-Tema: " + selectedTheme
                             + "\n-Cantidad de productos: " + productoQuantityComboBox
                             + "\n-Presupuesto: " + (presupuestoCheckBox ? "Sí" : "No")
+                            + "\n-Carátula: " + (caratula ? "Sí" : "No")
                             + "\n-Título: " + titleTextInput
-                            + "\n-Subtítulo: " + subtitleTextInput);
-
-                    final HashMap<String, Object> fila = new HashMap<>();
-                    fila.put("listaPrecios", listaPrecios);
-                    fila.put("mixProductos", mixProductos);
-                    fila.put("clasificacion", clasificacion);
-                    fila.put("selectedTheme", selectedTheme);
-                    fila.put("productoQuantityComboBox", productoQuantityComboBox);
-                    fila.put("imageSizeTextInput", imageSizeTextInput);
-                    fila.put("presupuestoCheckBox", presupuestoCheckBox);
-                    fila.put("titleTextInput", titleTextInput);
-                    fila.put("subtitleTextInput", subtitleTextInput);
-
-                    parametros.add(fila);
+                            + "\n-Subtítulo: " + subtitleTextInput
+                            + "\n-Carpeta destino: " + carpetaDestino);
                 }
             }
             return parametros;
@@ -202,14 +199,18 @@ public class CommandLine {
                 final String listaPrecios = (String) map.get("listaPrecios");
                 final String mixProductos = (String) map.get("mixProductos");
                 final String clasificacion = (String) map.get("clasificacion");
-                if (listaPrecios == null || mixProductos == null || clasificacion == null) continue;
+                if (listaPrecios == null || mixProductos == null) continue;
 
                 System.out.println(dtf.format(LocalDateTime.now()) + ": Procesando..." +
                         " (Lista de precios: " + listaPrecios + " - Mix productos: " + mixProductos + " - Clasificación: " + clasificacion + ")");
 
                 // Filtrar y ordenar
                 System.out.println(dtf.format(LocalDateTime.now()) + ": Filtrando y ordenando datos...");
-                Dispatch.call(xl, "Run", "FiltrarYOrdenar", new Variant(mixProductos), new Variant(clasificacion));
+                if (clasificacion == null || clasificacion.isBlank()) {
+                    Dispatch.call(xl, "Run", "FiltrarYOrdenar", new Variant(mixProductos));
+                } else {
+                    Dispatch.call(xl, "Run", "FiltrarYOrdenar", new Variant(mixProductos), new Variant(clasificacion));
+                }
 
                 // Exportar
                 System.out.println(dtf.format(LocalDateTime.now()) + ": Exportando datos filtrados...");
@@ -220,7 +221,7 @@ public class CommandLine {
                 Dispatch nuevo = Dispatch.call(workbooks, "Item", count).toDispatch();
 
                 // Guardar nuevo workbook de forma segura
-                Path rutaExcelOrigen = Paths.get(getJarFolder(), "Resultados", listaPrecios + "-" + mixProductos + "-" + clasificacion + ".xlsx");
+                Path rutaExcelOrigen = Paths.get(getJarFolder(), "Resultados", listaPrecios + "-" + mixProductos + (clasificacion.isBlank() ? "" : " - " + clasificacion) + ".xlsx");
                 try {
                     Files.deleteIfExists(rutaExcelOrigen);
                 } catch (Exception ex) {
@@ -255,6 +256,7 @@ public class CommandLine {
                 String listaPrecios = (String) fila.get("listaPrecios");
                 String mixProductos = (String) fila.get("mixProductos");
                 String clasificacion = (String) fila.get("clasificacion");
+                boolean caratula = (boolean) fila.get("caratula");
                 String selectedTheme = (String) fila.get("selectedTheme");
                 int productoQuantityComboBox = (int) fila.get("productoQuantityComboBox");
                 String imageSizeTextInput = (String) fila.get("imageSizeTextInput");
@@ -262,49 +264,36 @@ public class CommandLine {
                 String titleTextInput = (String) fila.get("titleTextInput");
                 String subtitleTextInput = (String) fila.get("subtitleTextInput");
                 String rutaExcelOrigen = (String) fila.get("rutaExcelOrigen");
+                String carpetaDestino = (String) fila.get("carpetaDestino");
                 final File archivoOrigenExcel = new File(rutaExcelOrigen);
-                final File carpetaDestino;
-                if (selectedTheme.equals(KitchenToolsTheme.THEME_NAME)) {
-                    carpetaDestino = carpetaDestinoKT;
-                } else if (selectedTheme.equals(LineageTheme.THEME_NAME)) {
-                    carpetaDestino = carpetaDestinoLGE;
-                } else {
-                    throw new Exception("El tema seleccionado no es válido: " + selectedTheme);
-                }
-                final File archivoDestinoPdf = new File(carpetaDestino.getAbsolutePath() + File.separator + clasificacion + " - " + mixProductos + ".pdf");
+                final File carpetaDestinoFile = new File(carpetaDestino);
 
-                if (validarArchivoOrigenExcel(archivoOrigenExcel)) {
-                    final int productos = PDFGenerator.generarPDF(archivoOrigenExcel, carpetaImagenes, archivoCaratulaPdf, archivoDestinoPdf,
-                            Float.parseFloat(imageSizeTextInput),
-                            Float.parseFloat(pageWidthTextInput),
-                            Float.parseFloat(pageHeightTextInput),
-                            codigoCheckBox, productoCheckBox, precioCheckBox,
-                            unidadPorBultoCheckBox, imagenCheckBox, null,
-                            productoQuantityComboBox, titleTextInput, subtitleTextInput,
-                            selectedTheme, presupuestoCheckBox);
-
-                    System.out.println("------------------------------------------------------------------------------------------------------------------");
-                    System.out.println(dtf.format(LocalDateTime.now()) + ": Generando catálogo: " + archivoDestinoPdf.getName() + "...");
-                    System.out.println(dtf.format(LocalDateTime.now()) + ": " + productos + " productos han sido generados.");
-                    System.out.println(dtf.format(LocalDateTime.now()) + ": \"" + archivoDestinoPdf.getAbsolutePath() + "\" generado.");
+                if (validarCarpetaDestino(carpetaDestinoFile)) {
+                    final File archivoDestinoPdf = new File(carpetaDestinoFile.getAbsolutePath() + File.separator + (clasificacion.isBlank() ? "" : clasificacion + " - ") + mixProductos + ".pdf");
+                    if (validarArchivoOrigenExcel(archivoOrigenExcel)) {
+                        final int productos = PDFGenerator.generarPDF(archivoOrigenExcel, carpetaImagenes, caratula, archivoDestinoPdf,
+                                Float.parseFloat(imageSizeTextInput),
+                                Float.parseFloat(pageWidthTextInput),
+                                Float.parseFloat(pageHeightTextInput),
+                                codigoCheckBox, productoCheckBox, precioCheckBox,
+                                unidadPorBultoCheckBox, imagenCheckBox, null,
+                                productoQuantityComboBox, titleTextInput, subtitleTextInput,
+                                selectedTheme, presupuestoCheckBox);
+                        System.out.println("------------------------------------------------------------------------------------------------------------------");
+                        System.out.println(dtf.format(LocalDateTime.now()) + ": Generando catálogo: " + archivoDestinoPdf.getName() + "...");
+                        System.out.println(dtf.format(LocalDateTime.now()) + ": " + productos + " productos han sido generados.");
+                        System.out.println(dtf.format(LocalDateTime.now()) + ": \"" + archivoDestinoPdf.getAbsolutePath() + "\" generado.");
+                    } else {
+                        System.out.println(dtf.format(LocalDateTime.now()) + ": El archivo Excel de origen no existe o está vacío para: " + listaPrecios + " - " + mixProductos + (clasificacion.isBlank() ? "" : " - " + clasificacion));
+                    }
                 } else {
-                    System.out.println(dtf.format(LocalDateTime.now()) + ": El archivo Excel de origen no existe o está vacío para: " + listaPrecios + "-" + mixProductos + "-" + clasificacion);
+                    System.out.println(dtf.format(LocalDateTime.now()) + ": La ubicacion: " + carpetaDestinoFile.getAbsolutePath() + " no existe.");
                 }
             }
             System.out.println("------------------------------------------------------------------------------------------------------------------");
             System.out.println(dtf.format(LocalDateTime.now()) + ": Proceso finalizado.");
         }
     }
-
-//    private void deletePdfs(Path folder) throws IOException {
-//        System.out.println("Eliminando archivos PDF de: " + folder.toString());
-//        try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder, "*.pdf")) {
-//            for (Path entry : stream) {
-//                Files.deleteIfExists(entry);
-//                System.out.println("Eliminado: " + entry.getFileName());
-//            }
-//        }
-//    }
 
     private boolean isNumeric(String strNum) {
         if (strNum == null) {
@@ -336,6 +325,10 @@ public class CommandLine {
         return true;
     }
 
+    private boolean validarCarpetaDestino(File carpetaDestino) {
+        return carpetaDestino != null && carpetaDestino.isDirectory();
+    }
+
     private boolean validarInputs() throws Exception {
         if (isNumeric(pageWidthTextInput) && isNumeric(pageHeightTextInput)) {
             return true;
@@ -345,10 +338,7 @@ public class CommandLine {
     }
 
     private boolean validarUbicaciones() throws Exception {
-        if (carpetaImagenes != null && carpetaImagenes.isDirectory() &&
-                carpetaDestinoKT != null && carpetaDestinoKT.isDirectory() &&
-                carpetaDestinoLGE != null && carpetaDestinoLGE.isDirectory() &&
-                archivoMasterExcel != null && archivoMasterExcel.isFile()) {
+        if (carpetaImagenes != null && carpetaImagenes.isDirectory() && archivoMasterExcel != null && archivoMasterExcel.isFile()) {
             return true;
         } else {
             throw new Exception("Las ubicaciones del excel 'Parametros' en la hoja 'Ubicaciones' son incorrectas.");

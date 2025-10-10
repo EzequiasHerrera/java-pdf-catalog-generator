@@ -9,7 +9,7 @@ import java.io.File;
 public class GeneratePDFService extends Service<Integer> {
     private final File archivoExcel;
     private final File carpetaImagenes;
-    private final File archivoPdf;
+    private final boolean caratula;
     private final File archivoDestino;
 
     // CONFIGURACION DE IMAGEN Y TAMAÑO DE PAGINA
@@ -39,7 +39,7 @@ public class GeneratePDFService extends Service<Integer> {
 
             File archivoExcel,
             File carpetaImagenes,
-            File archivoPdf,
+            boolean caratula,
             File archivoDestino,
 
             float imageSize,
@@ -58,13 +58,13 @@ public class GeneratePDFService extends Service<Integer> {
             String subtitleTextInput,
             String selectedTheme,
             boolean presupuestoActivo
-            ) {
+    ) {
 
         // ASIGNO EL VALOR A CADA VARIABLE CON EL VALOR DE LAS VARIABLES QUE ENTRAN COMO
         // PARAMETROS EN LA FUNCION
         this.archivoExcel = archivoExcel;
         this.carpetaImagenes = carpetaImagenes;
-        this.archivoPdf = archivoPdf;
+        this.caratula = caratula;
         this.archivoDestino = archivoDestino;
 
         this.imageSize = imageSize;
@@ -92,7 +92,7 @@ public class GeneratePDFService extends Service<Integer> {
         return new Task<>() {
             @Override
             protected Integer call() throws Exception {
-                return PDFGenerator.generarPDF(archivoExcel, carpetaImagenes, archivoPdf, archivoDestino,
+                return PDFGenerator.generarPDF(archivoExcel, carpetaImagenes, caratula, archivoDestino,
                         imageSize, pageWidth, pageHeight,
                         codigoColumn, productoColumn, precioColumn, unidadPorBultoColumn,
                         imagenes, logTextArea, productoQuantity, titleTextInput, subtitleTextInput, selectedTheme, presupuestoActivo);

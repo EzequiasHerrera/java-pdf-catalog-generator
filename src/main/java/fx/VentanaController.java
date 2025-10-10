@@ -115,8 +115,8 @@ public class VentanaController implements Initializable {
     // Directorio donde encontrar las imagenes
     private File carpetaImagenes;
 
-    // Directorio donde encontrar carátula PDF
-    private File archivoPdf;
+    // Determina si incluir o no caratula
+    private boolean caratula;
 
     // Directorio donde guardar NUEVO PDF
     private File archivoDestino;
@@ -160,6 +160,8 @@ public class VentanaController implements Initializable {
 
         errorSound.setVolume(0.1);
         successSound.setVolume(0.1);
+
+        caratula = true; // Siempre con caratula. TODO: agregar opción en interfaz
 
         carpetaImagenes = new File("Z:\\Doc. Compartidos\\DUX ERP Linea GE\\IMAGENES (subidas a la Web)");
 
@@ -409,7 +411,7 @@ public class VentanaController implements Initializable {
                 if (elegirDestino()) {
                     // ACA LLAMA AL GENERADOR DEL PDF
                     GeneratePDFService service = new GeneratePDFService(
-                            archivoExcel, carpetaImagenes, archivoPdf, archivoDestino,
+                            archivoExcel, carpetaImagenes, caratula, archivoDestino,
                             Float.parseFloat(imageSizeTextInput.getText()),
                             Float.parseFloat(pageWidthTextInput.getText()),
                             Float.parseFloat(pageHeightTextInput.getText()),
@@ -585,15 +587,12 @@ public class VentanaController implements Initializable {
             fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         }
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo PDF", "*.pdf"));
-        fileChooser.setInitialFileName(
-                (archivoPdf != null ? archivoPdf.getName().replaceFirst("[.][^.]+$", "").toUpperCase() : "") + " - "
-                        + formatter.format(LocalDate.now()));
+        fileChooser.setInitialFileName(" - " + formatter.format(LocalDate.now()));
         archivoDestino = fileChooser.showSaveDialog(Main.stage);
-        if (archivoDestino != null) {
-            return true;
-        } else {
+        if (archivoDestino == null) {
             return false;
         }
+        return true;
     }
 
 }

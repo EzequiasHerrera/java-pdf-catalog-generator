@@ -26,8 +26,7 @@ import themes.Theme;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.util.Locale;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class PDFUtils {
@@ -85,11 +84,10 @@ public class PDFUtils {
                     default:
                         return "";
                 }
-            case BLANK:
-                return "";
             case ERROR:
                 throw new Exception("Error en la celda fila: " + cell.getAddress().getRow() + 1 + " columna: "
                         + cell.getAddress().getColumn() + 1);
+            case BLANK:
             default:
                 return "";
         }
@@ -106,7 +104,7 @@ public class PDFUtils {
     public static void addFirstPage(Document doc, float pageHeight, float pageWidth, String titleTextInput,
                                     String subtitleTextInput, Theme theme, boolean presupuestoActivo) throws Exception {
 
-        if (titleTextInput == null || titleTextInput.trim().isEmpty()) {
+        if (titleTextInput == null || titleTextInput.isBlank()) {
             titleTextInput = "CATÁLOGO";
         }
 
@@ -119,18 +117,17 @@ public class PDFUtils {
                 .setPaddingTop(30)
                 .setMultipliedLeading(0.8f);
 
+        if (subtitleTextInput == null || subtitleTextInput.isBlank()) {
+            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+            subtitleTextInput = formatter.format(LocalDate.now());
+        }
+
         Paragraph subtitulo = new Paragraph(subtitleTextInput)
                 .setFontSize(25)
                 .simulateBold()
                 .setFontColor(theme.subtitleTextColor)
                 .setPadding(10)
                 .setTextAlignment(TextAlignment.CENTER);
-
-        if (subtitleTextInput == null || subtitleTextInput.trim().isEmpty()) {
-            String mes = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, new Locale("es"));
-            int anio = LocalDate.now().getYear();
-            subtitleTextInput = mes + " " + anio;
-        }
 
         Image logo = new Image(theme.logoImage);
         logo.setWidth(300);
@@ -209,13 +206,11 @@ public class PDFUtils {
             }
         }
 
-//        log.append(rowCount);
-
         return rowCount;
     }
 
     // Define el fondo del PDF
-    public static void setPDFBackground(PdfDocument pdfDoc, ImageData portada, ImageData fondoGeneral) {
+    public static void setPDFBackground(PdfDocument pdfDoc, ImageData portada, ImageData fondoGeneral, boolean caratula) {
         pdfDoc.addEventHandler(PdfDocumentEvent.START_PAGE, new AbstractPdfDocumentEventHandler() {
             @Override
             protected void onAcceptedEvent(AbstractPdfDocumentEvent event) { // MODIFICADO PARA LA NUEVA VERSION
@@ -230,7 +225,7 @@ public class PDFUtils {
                         pdfDoc);
 
                 // Elegimos la imagen según el número de página
-                ImageData fondo = (pageNumber == 1) ? portada : fondoGeneral;
+                ImageData fondo = (caratula && pageNumber == 1) ? portada : fondoGeneral;
                 canvas.addImageFittedIntoRectangle(fondo, pageSize, false);
             }
         });

@@ -21,6 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import themes.KitchenToolsTheme;
 import themes.LineageTheme;
 import themes.Theme;
+import utils.BackgroundHandler;
 import utils.FooterHandler;
 import utils.PDFUtils;
 
@@ -31,7 +32,7 @@ public class PDFGenerator {
     public static int generarPDF(
             File archivoExcel,
             File carpetaImagenes,
-            File archivoCaratulaPdf,
+            boolean caratula,
             File archivoDestino,
 
             float imageSize,
@@ -55,35 +56,32 @@ public class PDFGenerator {
         int totalProducts = 0;
         final int productsPerPage = productoQuantity; // CANTIDAD DE PRODUCTOS QUE QUIERO POR PAGINA
         final StringBuilder log = new StringBuilder();
-        final Theme theme = (selectedTheme.equalsIgnoreCase(KitchenToolsTheme.THEME_NAME)) ? KitchenToolsTheme.getTheme() : LineageTheme.getTheme();
-
-        // IMAGENES CARGADAS SEGUN EL THEME
-        final ImageData backgroundFirstPageImg = theme.backgroundFirstPageImage;
-        final ImageData backgroundImg = theme.backgroundImage;
 
         try ( // EXCEL ----------------------------------------------
               final OPCPackage pkg = OPCPackage.open(archivoExcel, PackageAccess.READ);
               final XSSFWorkbook workbook = new XSSFWorkbook(pkg)) {
 
             final Sheet sheet = workbook.getSheetAt(0);
-            final Row excelColumns = sheet.getRow(0);
-            totalProducts = PDFUtils.countRowsInFile(sheet, log);
-            // EXCEL ----------------------------------------------
+            final Row firstRow = sheet.getRow(0);
 
-            try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
-                 final PdfDocument pdfDoc = new PdfDocument(writer);
-                 final Document doc = new Document(pdfDoc, PageSize.A4)) {
+            if (PDFUtils.isValidExcel(firstRow)) {
+                totalProducts = PDFUtils.countRowsInFile(sheet, log);
+                // EXCEL ----------------------------------------------
 
-                final PdfFont font = PdfFontFactory.createFont(); // Fuente por defecto
-                final ImageData logoData = theme.logoImage; // Cargar logo desde recursos (classpath)
-                final float fontSize = 10f; // tamaño de fuente para el pie de página
-                final float y = 20f; // margen inferior
+                try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
+                     final PdfDocument pdfDoc = new PdfDocument(writer);
+                     final Document doc = new Document(pdfDoc, PageSize.A4)) {
 
-                pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new FooterHandler(font, logoData, fontSize, y)); // Agregar pie de página a cada página
+                    // IMAGENES CARGADAS SEGUN EL THEME
+                    final Theme theme = (selectedTheme.equalsIgnoreCase(KitchenToolsTheme.THEME_NAME)) ? KitchenToolsTheme.getTheme() : LineageTheme.getTheme();
+                    final ImageData backgroundFirstPageImg = theme.backgroundFirstPageImage;
+                    final ImageData backgroundImg = theme.backgroundImage;
+                    final PdfFont font = PdfFontFactory.createFont(); // Fuente por defecto
+                    final ImageData logoData = theme.logoImage; // Cargar logo desde recursos (classpath)
 
-                if (PDFUtils.isValidExcel(excelColumns)) {
 
-                    PDFUtils.setPDFBackground(pdfDoc, backgroundFirstPageImg, backgroundImg);
+                    pdfDoc.addEventHandler(PdfDocumentEvent.START_PAGE, new BackgroundHandler(pdfDoc, backgroundFirstPageImg, backgroundImg, caratula)); // Agregar fondo a cada página
+                    pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new FooterHandler(font, logoData, caratula)); // Agregar pie de página a cada página
 
                     if (productsPerPage <= 12) {
                         doc.setMargins(10, 10, 10, 10);
@@ -91,7 +89,9 @@ public class PDFGenerator {
                         doc.setMargins(10, 0, 0, 0);
                     }
 
-                    PDFUtils.addFirstPage(doc, pageHeight, pageWidth, titleTextInput, subtitleTextInput, theme, presupuestoActivo);
+                    if (caratula) {
+                        PDFUtils.addFirstPage(doc, pageHeight, pageWidth, titleTextInput, subtitleTextInput, theme, presupuestoActivo);
+                    }
 
                     int actualProductIndex = 1;
 
@@ -144,16 +144,15 @@ public class PDFGenerator {
                             doc.add(new AreaBreak());
                         }
                     }
-
+                } catch (Exception e) {
+                    throw e;
                 }
-            } catch (Exception e) {
-                throw e;
             }
         } catch (Exception e) {
             throw e;
         }
 
-        if (logTextArea != null && log.length() > 0) {
+        if (logTextArea != null && !log.isEmpty()) {
             Platform.runLater(() -> {
                 logTextArea.setStyle("-fx-text-fill: #d3d700;");
                 logTextArea.appendText(log.toString());
