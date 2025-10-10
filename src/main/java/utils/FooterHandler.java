@@ -2,7 +2,6 @@ package utils;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.kernel.colors.ColorConstants;
-import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -11,11 +10,6 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEvent;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler;
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.Style;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.VerticalAlignment;
 
 public class FooterHandler extends AbstractPdfDocumentEventHandler {
 
@@ -66,13 +60,5 @@ public class FooterHandler extends AbstractPdfDocumentEventHandler {
         canvas.addImageFittedIntoRectangle(logoData, rect, false);
     }
 
-//    private void agregarNumeroPagina(PdfDocument pdfDoc, Document doc) {
-//        final int numberOfPages = pdfDoc.getNumberOfPages();
-//        final Style fontStyle = new Style().setFontSize(5).setFontColor(new DeviceRgb(128, 128, 128));
-//        for (int i = 1; i <= numberOfPages; i++) {
-//            // Write aligned text to the specified parameters point
-//            doc.showTextAligned(new Paragraph(String.format("Página %s de %s", i, numberOfPages)).addStyle(fontStyle),
-//                    pageWidth / 2, 2.5f, i, TextAlignment.CENTER, VerticalAlignment.MIDDLE, 0);
-//        }
 }
 
