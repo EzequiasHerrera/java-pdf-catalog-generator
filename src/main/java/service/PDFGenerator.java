@@ -3,7 +3,6 @@ package service;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
@@ -19,11 +18,15 @@ import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import pdf.*;
+import pdf.BackgroundHandler;
+import pdf.CellBuilder;
+import pdf.FooterHandler;
+import pdf.TableBuilder;
 import pdf.themes.KitchenToolsTheme;
 import pdf.themes.LineageTheme;
 import pdf.themes.Theme;
-import utils.*;
+import utils.ExcelUtils;
+import utils.PDFUtils;
 
 import java.io.File;
 
@@ -69,7 +72,7 @@ public class PDFGenerator {
 
                 try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
                      final PdfDocument pdfDoc = new PdfDocument(writer);
-                     final Document doc = new Document(pdfDoc, PageSize.A4)) {
+                     final Document doc = new Document(pdfDoc, pageType.toPageSize())) {
 
                     // IMAGENES CARGADAS SEGUN EL THEME
                     final Theme theme = (selectedTheme.equalsIgnoreCase(KitchenToolsTheme.THEME_NAME)) ? KitchenToolsTheme.getTheme() : LineageTheme.getTheme();
@@ -114,7 +117,7 @@ public class PDFGenerator {
                             // VUELTA PAR O IMPAR (para saber si va a la izquierda o derecha)
                             boolean esPar = itemsThisPage % 2 == 0;
 
-                            final Cell container = CellBuilder.createTest(
+                            final Cell container = CellBuilder.createCell(
                                     sheet,
                                     actualProductIndex,
                                     codigoColumn,

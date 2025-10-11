@@ -14,7 +14,7 @@ import java.io.File;
 
 public class CellBuilder {
 
-    public static Cell createTest(Sheet sheet, int rowNumber, boolean codigoColumn, boolean productoColumn,
+    public static Cell createCell(Sheet sheet, int rowNumber, boolean codigoColumn, boolean productoColumn,
                                   boolean precioColumn, boolean unidadPorBultoColumn,
                                   boolean imagenes, File carpetaImagenes, float imageSize, float pageWidth, float pageHeight,
                                   float itemsThisPage,
