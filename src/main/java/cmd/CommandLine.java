@@ -85,85 +85,91 @@ public class CommandLine {
     }
 
     public List<HashMap<String, Object>> obtenerParametros() throws Exception {
+
         final File excel = new File(this.getJarFolder() + File.separator + "Parametros.xlsx");
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
-        final List<HashMap<String, Object>> parametros = new ArrayList<>();
 
-        try (final OPCPackage pkg = OPCPackage.open(excel, PackageAccess.READ);
-             final XSSFWorkbook workbook = new XSSFWorkbook(pkg)) {
+        if (excel.isFile()) {
+            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+            final List<HashMap<String, Object>> parametros = new ArrayList<>();
 
-            // HOJA UBICACIONES
-            final Sheet ubicacionesSheet = workbook.getSheetAt(1); // 2° hoja
+            try (final OPCPackage pkg = OPCPackage.open(excel, PackageAccess.READ);
+                 final XSSFWorkbook workbook = new XSSFWorkbook(pkg)) {
 
-            Row row = ubicacionesSheet.getRow(1); // 2° fila
-            if (ExcelUtils.isEmptyRow(row)) {
-                throw new Exception("La hoja 'Ubicaciones' está vacía.");
-            }
+                // HOJA UBICACIONES
+                final Sheet ubicacionesSheet = workbook.getSheetAt(1); // 2° hoja
 
-            archivoMasterExcel = Paths.get(ExcelUtils.getCellValue(row.getCell(0))).toFile(); // A
-            carpetaImagenes = Paths.get(ExcelUtils.getCellValue(row.getCell(1))).toFile(); // B
-
-            System.out.println("------------------------------------------------------------------------------------------------------------------");
-            System.out.println(dtf.format(LocalDateTime.now()) + ": Ubicaciones cargadas:"
-                    + "\n-Archivo Super Master: " + archivoMasterExcel.getAbsolutePath()
-                    + "\n-Imágenes: " + carpetaImagenes.getAbsolutePath());
-
-            if (validarUbicaciones()) {
-                // HOJA PARAMETROS
-                final Sheet parametrosSheet = workbook.getSheetAt(0); // 1° hoja
-                final int parametrosRows = ExcelUtils.countRowsInFile(parametrosSheet, new StringBuilder());
-
-                for (int r = 1; r <= parametrosRows; r++) { // Empiezo en la fila 2
-                    row = parametrosSheet.getRow(r);
-                    if (ExcelUtils.isEmptyRow(row)) {
-                        continue;
-                    }
-                    // LEER CELDAS
-                    String listaPrecios = ExcelUtils.getCellValue(row.getCell(0)); //
-                    String mixProductos = ExcelUtils.getCellValue(row.getCell(1)); //
-                    String clasificacion = ExcelUtils.getCellValue(row.getCell(2)); //
-                    boolean caratula = ExcelUtils.getCellValue(row.getCell(3)).equalsIgnoreCase("SI"); //
-                    String title = ExcelUtils.getCellValue(row.getCell(4)); //
-                    String selectedTheme = ExcelUtils.getCellValue(row.getCell(5)); //
-                    boolean presupuesto = ExcelUtils.getCellValue(row.getCell(6)).equalsIgnoreCase("PRESUPUESTO"); //
-                    int productoQuantity = (int) Double.parseDouble(ExcelUtils.getCellValue(row.getCell(7))); //
-                    String subtitle = formatter.format(LocalDate.now()); // Fecha actual
-                    String carpetaDestino = ExcelUtils.getCellValue(row.getCell(8)); //
-
-                    // SETEAR TAMAÑO DE IMAGEN DEPENDIENDO LA CANTIDAD DE PRODUCTOS
-                    final float imageSize = ProductQuantity.fromQuantity(productoQuantity).getImageSize();
-                    // GUARDAR FILA EN LISTA DE PARAMETROS
-                    final HashMap<String, Object> fila = new HashMap<>();
-                    fila.put("listaPrecios", listaPrecios);
-                    fila.put("mixProductos", mixProductos);
-                    fila.put("clasificacion", clasificacion);
-                    fila.put("caratula", caratula);
-                    fila.put("selectedTheme", selectedTheme);
-                    fila.put("productoQuantity", productoQuantity);
-                    fila.put("imageSize", imageSize);
-                    fila.put("presupuesto", presupuesto);
-                    fila.put("title", title);
-                    fila.put("subtitle", subtitle);
-                    fila.put("carpetaDestino", carpetaDestino);
-                    parametros.add(fila);
-
-                    System.out.println("------------------------------------------------------------------------------------------------------------------");
-                    System.out.println(dtf.format(LocalDateTime.now()) + ": Parámetros cargados:"
-                            + "\n-Lista de precios: " + listaPrecios
-                            + "\n-Mix productos: " + mixProductos
-                            + "\n-Clasificación: " + clasificacion
-                            + "\n-Tema: " + selectedTheme
-                            + "\n-Cantidad de productos: " + productoQuantity
-                            + "\n-Presupuesto: " + (presupuesto ? "Sí" : "No")
-                            + "\n-Carátula: " + (caratula ? "Sí" : "No")
-                            + "\n-Título: " + title
-                            + "\n-Subtítulo: " + subtitle
-                            + "\n-Carpeta destino: " + carpetaDestino);
+                Row row = ubicacionesSheet.getRow(1); // 2° fila
+                if (ExcelUtils.isEmptyRow(row)) {
+                    throw new Exception("La hoja 'Ubicaciones' está vacía.");
                 }
+
+                archivoMasterExcel = Paths.get(ExcelUtils.getCellValue(row.getCell(0))).toFile(); // A
+                carpetaImagenes = Paths.get(ExcelUtils.getCellValue(row.getCell(1))).toFile(); // B
+
+                System.out.println("------------------------------------------------------------------------------------------------------------------");
+                System.out.println(dtf.format(LocalDateTime.now()) + ": Ubicaciones cargadas:"
+                        + "\n-Archivo Super Master: " + archivoMasterExcel.getAbsolutePath()
+                        + "\n-Imágenes: " + carpetaImagenes.getAbsolutePath());
+
+                if (validarUbicaciones()) {
+                    // HOJA PARAMETROS
+                    final Sheet parametrosSheet = workbook.getSheetAt(0); // 1° hoja
+                    final int parametrosRows = ExcelUtils.countRowsInFile(parametrosSheet, new StringBuilder());
+
+                    for (int r = 1; r <= parametrosRows; r++) { // Empiezo en la fila 2
+                        row = parametrosSheet.getRow(r);
+                        if (ExcelUtils.isEmptyRow(row)) {
+                            continue;
+                        }
+                        // LEER CELDAS
+                        String listaPrecios = ExcelUtils.getCellValue(row.getCell(0)); //
+                        String mixProductos = ExcelUtils.getCellValue(row.getCell(1)); //
+                        String clasificacion = ExcelUtils.getCellValue(row.getCell(2)); //
+                        boolean caratula = ExcelUtils.getCellValue(row.getCell(3)).equalsIgnoreCase("SI"); //
+                        String title = ExcelUtils.getCellValue(row.getCell(4)); //
+                        String selectedTheme = ExcelUtils.getCellValue(row.getCell(5)); //
+                        boolean presupuesto = ExcelUtils.getCellValue(row.getCell(6)).equalsIgnoreCase("PRESUPUESTO"); //
+                        int productoQuantity = (int) Double.parseDouble(ExcelUtils.getCellValue(row.getCell(7))); //
+                        String subtitle = formatter.format(LocalDate.now()); // Fecha actual
+                        String carpetaDestino = ExcelUtils.getCellValue(row.getCell(8)); //
+
+                        // SETEAR TAMAÑO DE IMAGEN DEPENDIENDO LA CANTIDAD DE PRODUCTOS
+                        final float imageSize = ProductQuantity.fromQuantity(productoQuantity).getImageSize();
+                        // GUARDAR FILA EN LISTA DE PARAMETROS
+                        final HashMap<String, Object> fila = new HashMap<>();
+                        fila.put("listaPrecios", listaPrecios);
+                        fila.put("mixProductos", mixProductos);
+                        fila.put("clasificacion", clasificacion);
+                        fila.put("caratula", caratula);
+                        fila.put("selectedTheme", selectedTheme);
+                        fila.put("productoQuantity", productoQuantity);
+                        fila.put("imageSize", imageSize);
+                        fila.put("presupuesto", presupuesto);
+                        fila.put("title", title);
+                        fila.put("subtitle", subtitle);
+                        fila.put("carpetaDestino", carpetaDestino);
+                        parametros.add(fila);
+
+                        System.out.println("------------------------------------------------------------------------------------------------------------------");
+                        System.out.println(dtf.format(LocalDateTime.now()) + ": Parámetros cargados:"
+                                + "\n-Lista de precios: " + listaPrecios
+                                + "\n-Mix productos: " + mixProductos
+                                + "\n-Clasificación: " + clasificacion
+                                + "\n-Tema: " + selectedTheme
+                                + "\n-Cantidad de productos: " + productoQuantity
+                                + "\n-Presupuesto: " + (presupuesto ? "Sí" : "No")
+                                + "\n-Carátula: " + (caratula ? "Sí" : "No")
+                                + "\n-Título: " + title
+                                + "\n-Subtítulo: " + subtitle
+                                + "\n-Carpeta destino: " + carpetaDestino);
+                    }
+                }
+                return parametros;
+            } catch (Exception e) {
+                throw e;
             }
-            return parametros;
-        } catch (Exception e) {
-            throw e;
+        } else {
+            throw new Exception("No se encontró el archivo 'Parametros.xlsx' en: " + excel.getAbsolutePath());
         }
     }
 
