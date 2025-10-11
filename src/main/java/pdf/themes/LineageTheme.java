@@ -1,4 +1,4 @@
-package themes;
+package pdf.themes;
 
 import java.net.MalformedURLException;
 

@@ -1,6 +1,6 @@
-package components;
+package pdf.components;
 
-import static utils.PDFStyleDefaults.BLACK_COLOR;
+import static pdf.PDFStyleDefaults.BLACK_COLOR;
 
 import org.apache.poi.ss.usermodel.Cell;
 
@@ -8,13 +8,14 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 
-import themes.Theme;
+import pdf.themes.Theme;
+import utils.ExcelUtils;
 import utils.PDFUtils;
 
 public class UxBComponent {
     public static Paragraph build(Cell cell, Theme theme) {
         try {
-            String uxbText = PDFUtils.safeText(PDFUtils.getCellValue(cell), "--");
+            String uxbText = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "--");
 
             Text valorUxb = new Text(uxbText).simulateBold();
 

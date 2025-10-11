@@ -1,4 +1,4 @@
-package components;
+package pdf.components;
 
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.layout.borders.SolidBorder;

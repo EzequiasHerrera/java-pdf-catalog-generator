@@ -1,16 +1,16 @@
-package utils;
+package enums;
 
 public enum ProductQuantity {
 
-    TWO(2, "380"),
-    FOUR(4, "190"),
-    TWELVE(12, "90"),
-    TWENTY(20, "60");
+    TWO(2, 380),
+    FOUR(4, 190),
+    TWELVE(12, 90),
+    TWENTY(20, 60);
 
     private final int quantity;
-    private final String imageSize;
+    private final float imageSize;
 
-    ProductQuantity(int quantity, String imageSize) {
+    ProductQuantity(int quantity, float imageSize) {
         this.quantity = quantity;
         this.imageSize = imageSize;
     }
@@ -19,7 +19,7 @@ public enum ProductQuantity {
         return quantity;
     }
 
-    public String getImageSize() {
+    public float getImageSize() {
         return imageSize;
     }
 
@@ -29,7 +29,7 @@ public enum ProductQuantity {
                 return pq;
             }
         }
-        throw new Exception("La cantidad de productos debe ser 2, 4, 12 o 20.");
+        throw new Exception("La cantidad de productos debe ser: " + ProductQuantity.values());
     }
 
 }

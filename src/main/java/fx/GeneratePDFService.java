@@ -1,8 +1,10 @@
-package service;
+package fx;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.control.TextArea;
+import enums.PageType;
+import service.PDFGenerator;
 
 import java.io.File;
 
@@ -14,8 +16,7 @@ public class GeneratePDFService extends Service<Integer> {
 
     // CONFIGURACION DE IMAGEN Y TAMAÑO DE PAGINA
     private final float imageSize;
-    private final float pageWidth;
-    private final float pageHeight;
+    private final PageType pageType;
 
     // VARIABLES BOOLEAN DE CADA COLUMNA PARA SABER SI HAY QUE MOSTRARLA O NO
     private final boolean codigoColumn;
@@ -43,8 +44,7 @@ public class GeneratePDFService extends Service<Integer> {
             File archivoDestino,
 
             float imageSize,
-            float pageWidth,
-            float pageHeight,
+            PageType pageType,
 
             boolean codigoColumn,
             boolean productoColumn,
@@ -68,8 +68,7 @@ public class GeneratePDFService extends Service<Integer> {
         this.archivoDestino = archivoDestino;
 
         this.imageSize = imageSize;
-        this.pageWidth = pageWidth;
-        this.pageHeight = pageHeight;
+        this.pageType = pageType;
 
         this.codigoColumn = codigoColumn;
         this.productoColumn = productoColumn;
@@ -93,7 +92,7 @@ public class GeneratePDFService extends Service<Integer> {
             @Override
             protected Integer call() throws Exception {
                 return PDFGenerator.generarPDF(archivoExcel, carpetaImagenes, caratula, archivoDestino,
-                        imageSize, pageWidth, pageHeight,
+                        imageSize, pageType,
                         codigoColumn, productoColumn, precioColumn, unidadPorBultoColumn,
                         imagenes, logTextArea, productoQuantity, titleTextInput, subtitleTextInput, selectedTheme, presupuestoActivo);
             }

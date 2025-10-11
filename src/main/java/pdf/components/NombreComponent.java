@@ -1,19 +1,20 @@
-package components;
+package pdf.components;
 
-import static utils.PDFStyleDefaults.BLACK_COLOR;
+import static pdf.PDFStyleDefaults.BLACK_COLOR;
 
 import org.apache.poi.ss.usermodel.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 
-import themes.Theme;
+import pdf.themes.Theme;
 
+import utils.ExcelUtils;
 import utils.PDFUtils;
 
 public class NombreComponent {
     public static Paragraph build(Cell cell, Theme theme) {
         try {
-            String nombreValue = PDFUtils.safeText(PDFUtils.getCellValue(cell), "[SIN NOMBRE]");
+            String nombreValue = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "[SIN NOMBRE]");
 
             return new Paragraph(nombreValue)
                     .simulateBold()

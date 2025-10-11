@@ -1,4 +1,4 @@
-package utils;
+package pdf;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.kernel.geom.Rectangle;

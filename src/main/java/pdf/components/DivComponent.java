@@ -1,12 +1,12 @@
-package components;
+package pdf.components;
 
-import static utils.PDFStyleDefaults.*;
+import static pdf.PDFStyleDefaults.*;
 
 import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.VerticalAlignment;
 
-import themes.Theme;
+import pdf.themes.Theme;
 
 import com.itextpdf.layout.properties.BorderRadius;
 import com.itextpdf.layout.borders.SolidBorder;

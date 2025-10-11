@@ -1,10 +1,11 @@
-package components;
+package pdf.components;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.properties.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Cell;
+import utils.ExcelUtils;
 import utils.PDFUtils;
 
 import javax.imageio.ImageIO;
@@ -30,7 +31,7 @@ public class ImagenComponent {
     }
 
     public static Image build(Cell codigoCell, File carpetaImagenes, float imageSize) throws Exception {
-        String codigoValue = PDFUtils.safeText(PDFUtils.getCellValue(codigoCell), "[SIN CÓDIGO]");
+        String codigoValue = PDFUtils.safeText(ExcelUtils.getCellValue(codigoCell), "[SIN CÓDIGO]");
         String cleanCode = codigoValue.replace(",", ".");
         double codigoNum = Double.parseDouble(cleanCode);
         String codigoImagen = (codigoNum % 1 == 0) ? String.format("%.0f", codigoNum) : String.valueOf(codigoNum);

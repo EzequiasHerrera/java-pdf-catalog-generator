@@ -12,8 +12,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import service.PDFGenerator;
-import utils.PDFUtils;
-import utils.ProductQuantity;
+import utils.ExcelUtils;
+import enums.PageType;
+import enums.ProductQuantity;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,9 +38,7 @@ public class CommandLine {
     private File carpetaImagenes; // Directorio donde encontrar las imagenes
     private File archivoMasterExcel; // Archivo SUPER MASTER Excel
 
-    private String pageWidthTextInput;
-    private String pageHeightTextInput;
-
+    private PageType pageType; // TAMAÑO DE PÁGINA
     private boolean codigoCheckBox; // CODIGO
     private boolean productoCheckBox; // NOMBRE
     private boolean precioCheckBox; // PRECIO
@@ -77,8 +76,7 @@ public class CommandLine {
     }
 
     private void loadDefaultValues() {
-        pageWidthTextInput = "595"; // A4 width
-        pageHeightTextInput = "842"; // A4 height
+        pageType = PageType.A4;
         codigoCheckBox = true;
         productoCheckBox = true;
         precioCheckBox = true;
@@ -94,16 +92,16 @@ public class CommandLine {
         try (final OPCPackage pkg = OPCPackage.open(excel, PackageAccess.READ);
              final XSSFWorkbook workbook = new XSSFWorkbook(pkg)) {
 
-            // UBICACIONES
+            // HOJA UBICACIONES
             final Sheet ubicacionesSheet = workbook.getSheetAt(1); // 2° hoja
 
             Row row = ubicacionesSheet.getRow(1); // 2° fila
-            if (PDFUtils.isEmptyRow(row)) {
+            if (ExcelUtils.isEmptyRow(row)) {
                 throw new Exception("La hoja 'Ubicaciones' está vacía.");
             }
 
-            archivoMasterExcel = Paths.get(PDFUtils.getCellValue(row.getCell(0))).toFile(); // A
-            carpetaImagenes = Paths.get(PDFUtils.getCellValue(row.getCell(1))).toFile(); // B
+            archivoMasterExcel = Paths.get(ExcelUtils.getCellValue(row.getCell(0))).toFile(); // A
+            carpetaImagenes = Paths.get(ExcelUtils.getCellValue(row.getCell(1))).toFile(); // B
 
             System.out.println("------------------------------------------------------------------------------------------------------------------");
             System.out.println(dtf.format(LocalDateTime.now()) + ": Ubicaciones cargadas:"
@@ -111,29 +109,29 @@ public class CommandLine {
                     + "\n-Imágenes: " + carpetaImagenes.getAbsolutePath());
 
             if (validarUbicaciones()) {
-                // PARAMETROS
+                // HOJA PARAMETROS
                 final Sheet parametrosSheet = workbook.getSheetAt(0); // 1° hoja
-                final int parametrosRows = PDFUtils.countRowsInFile(parametrosSheet, new StringBuilder());
+                final int parametrosRows = ExcelUtils.countRowsInFile(parametrosSheet, new StringBuilder());
 
                 for (int r = 1; r <= parametrosRows; r++) { // Empiezo en la fila 2
                     row = parametrosSheet.getRow(r);
-                    if (PDFUtils.isEmptyRow(row)) {
+                    if (ExcelUtils.isEmptyRow(row)) {
                         continue;
                     }
                     // LEER CELDAS
-                    String listaPrecios = PDFUtils.getCellValue(row.getCell(0)); //
-                    String mixProductos = PDFUtils.getCellValue(row.getCell(1)); //
-                    String clasificacion = PDFUtils.getCellValue(row.getCell(2)); //
-                    boolean caratula = PDFUtils.getCellValue(row.getCell(3)).equalsIgnoreCase("SI"); //
-                    String titleTextInput = PDFUtils.getCellValue(row.getCell(4)); //
-                    String selectedTheme = PDFUtils.getCellValue(row.getCell(5)); //
-                    boolean presupuestoCheckBox = PDFUtils.getCellValue(row.getCell(6)).equalsIgnoreCase("PRESUPUESTO"); //
-                    int productoQuantityComboBox = (int) Double.parseDouble(PDFUtils.getCellValue(row.getCell(7))); //
-                    String subtitleTextInput = formatter.format(LocalDate.now()); // Fecha actual
-                    String carpetaDestino = PDFUtils.getCellValue(row.getCell(8)); //
+                    String listaPrecios = ExcelUtils.getCellValue(row.getCell(0)); //
+                    String mixProductos = ExcelUtils.getCellValue(row.getCell(1)); //
+                    String clasificacion = ExcelUtils.getCellValue(row.getCell(2)); //
+                    boolean caratula = ExcelUtils.getCellValue(row.getCell(3)).equalsIgnoreCase("SI"); //
+                    String title = ExcelUtils.getCellValue(row.getCell(4)); //
+                    String selectedTheme = ExcelUtils.getCellValue(row.getCell(5)); //
+                    boolean presupuesto = ExcelUtils.getCellValue(row.getCell(6)).equalsIgnoreCase("PRESUPUESTO"); //
+                    int productoQuantity = (int) Double.parseDouble(ExcelUtils.getCellValue(row.getCell(7))); //
+                    String subtitle = formatter.format(LocalDate.now()); // Fecha actual
+                    String carpetaDestino = ExcelUtils.getCellValue(row.getCell(8)); //
 
                     // SETEAR TAMAÑO DE IMAGEN DEPENDIENDO LA CANTIDAD DE PRODUCTOS
-                    final String imageSizeTextInput = ProductQuantity.fromQuantity(productoQuantityComboBox).getImageSize();
+                    final float imageSize = ProductQuantity.fromQuantity(productoQuantity).getImageSize();
                     // GUARDAR FILA EN LISTA DE PARAMETROS
                     final HashMap<String, Object> fila = new HashMap<>();
                     fila.put("listaPrecios", listaPrecios);
@@ -141,11 +139,11 @@ public class CommandLine {
                     fila.put("clasificacion", clasificacion);
                     fila.put("caratula", caratula);
                     fila.put("selectedTheme", selectedTheme);
-                    fila.put("productoQuantityComboBox", productoQuantityComboBox);
-                    fila.put("imageSizeTextInput", imageSizeTextInput);
-                    fila.put("presupuestoCheckBox", presupuestoCheckBox);
-                    fila.put("titleTextInput", titleTextInput);
-                    fila.put("subtitleTextInput", subtitleTextInput);
+                    fila.put("productoQuantity", productoQuantity);
+                    fila.put("imageSize", imageSize);
+                    fila.put("presupuesto", presupuesto);
+                    fila.put("title", title);
+                    fila.put("subtitle", subtitle);
                     fila.put("carpetaDestino", carpetaDestino);
                     parametros.add(fila);
 
@@ -155,11 +153,11 @@ public class CommandLine {
                             + "\n-Mix productos: " + mixProductos
                             + "\n-Clasificación: " + clasificacion
                             + "\n-Tema: " + selectedTheme
-                            + "\n-Cantidad de productos: " + productoQuantityComboBox
-                            + "\n-Presupuesto: " + (presupuestoCheckBox ? "Sí" : "No")
+                            + "\n-Cantidad de productos: " + productoQuantity
+                            + "\n-Presupuesto: " + (presupuesto ? "Sí" : "No")
                             + "\n-Carátula: " + (caratula ? "Sí" : "No")
-                            + "\n-Título: " + titleTextInput
-                            + "\n-Subtítulo: " + subtitleTextInput
+                            + "\n-Título: " + title
+                            + "\n-Subtítulo: " + subtitle
                             + "\n-Carpeta destino: " + carpetaDestino);
                 }
             }
@@ -251,48 +249,45 @@ public class CommandLine {
     }
 
     public void generarCatalogo(List<HashMap<String, Object>> parametros) throws Exception {
-        if (validarInputs()) {
-            for (HashMap<String, Object> fila : parametros) {
-                String listaPrecios = (String) fila.get("listaPrecios");
-                String mixProductos = (String) fila.get("mixProductos");
-                String clasificacion = (String) fila.get("clasificacion");
-                boolean caratula = (boolean) fila.get("caratula");
-                String selectedTheme = (String) fila.get("selectedTheme");
-                int productoQuantityComboBox = (int) fila.get("productoQuantityComboBox");
-                String imageSizeTextInput = (String) fila.get("imageSizeTextInput");
-                boolean presupuestoCheckBox = (boolean) fila.get("presupuestoCheckBox");
-                String titleTextInput = (String) fila.get("titleTextInput");
-                String subtitleTextInput = (String) fila.get("subtitleTextInput");
-                String rutaExcelOrigen = (String) fila.get("rutaExcelOrigen");
-                String carpetaDestino = (String) fila.get("carpetaDestino");
-                final File archivoOrigenExcel = new File(rutaExcelOrigen);
-                final File carpetaDestinoFile = new File(carpetaDestino);
+        for (HashMap<String, Object> fila : parametros) {
+            String listaPrecios = (String) fila.get("listaPrecios");
+            String mixProductos = (String) fila.get("mixProductos");
+            String clasificacion = (String) fila.get("clasificacion");
+            boolean caratula = (boolean) fila.get("caratula");
+            String selectedTheme = (String) fila.get("selectedTheme");
+            int productoQuantity = (int) fila.get("productoQuantity");
+            float imageSize = (float) fila.get("imageSize");
+            boolean presupuesto = (boolean) fila.get("presupuesto");
+            String title = (String) fila.get("title");
+            String subtitle = (String) fila.get("subtitle");
+            String rutaExcelOrigen = (String) fila.get("rutaExcelOrigen");
+            String carpetaDestino = (String) fila.get("carpetaDestino");
+            final File archivoOrigenExcel = new File(rutaExcelOrigen);
+            final File carpetaDestinoFile = new File(carpetaDestino);
 
-                if (validarCarpetaDestino(carpetaDestinoFile)) {
-                    final File archivoDestinoPdf = new File(carpetaDestinoFile.getAbsolutePath() + File.separator + (clasificacion.isBlank() ? "" : clasificacion + " - ") + mixProductos + ".pdf");
-                    if (validarArchivoOrigenExcel(archivoOrigenExcel)) {
-                        final int productos = PDFGenerator.generarPDF(archivoOrigenExcel, carpetaImagenes, caratula, archivoDestinoPdf,
-                                Float.parseFloat(imageSizeTextInput),
-                                Float.parseFloat(pageWidthTextInput),
-                                Float.parseFloat(pageHeightTextInput),
-                                codigoCheckBox, productoCheckBox, precioCheckBox,
-                                unidadPorBultoCheckBox, imagenCheckBox, null,
-                                productoQuantityComboBox, titleTextInput, subtitleTextInput,
-                                selectedTheme, presupuestoCheckBox);
-                        System.out.println("------------------------------------------------------------------------------------------------------------------");
-                        System.out.println(dtf.format(LocalDateTime.now()) + ": Generando catálogo: " + archivoDestinoPdf.getName() + "...");
-                        System.out.println(dtf.format(LocalDateTime.now()) + ": " + productos + " productos han sido generados.");
-                        System.out.println(dtf.format(LocalDateTime.now()) + ": \"" + archivoDestinoPdf.getAbsolutePath() + "\" generado.");
-                    } else {
-                        System.out.println(dtf.format(LocalDateTime.now()) + ": El archivo Excel de origen no existe o está vacío para: " + listaPrecios + " - " + mixProductos + (clasificacion.isBlank() ? "" : " - " + clasificacion));
-                    }
+            if (validarCarpetaDestino(carpetaDestinoFile)) {
+                final File archivoDestinoPdf = new File(carpetaDestinoFile.getAbsolutePath() + File.separator + (clasificacion.isBlank() ? "" : clasificacion + " - ") + mixProductos + ".pdf");
+                if (validarArchivoOrigenExcel(archivoOrigenExcel)) {
+                    final int productos = PDFGenerator.generarPDF(archivoOrigenExcel, carpetaImagenes, caratula, archivoDestinoPdf,
+                            imageSize,
+                            pageType,
+                            codigoCheckBox, productoCheckBox, precioCheckBox,
+                            unidadPorBultoCheckBox, imagenCheckBox, null,
+                            productoQuantity, title, subtitle,
+                            selectedTheme, presupuesto);
+                    System.out.println("------------------------------------------------------------------------------------------------------------------");
+                    System.out.println(dtf.format(LocalDateTime.now()) + ": Generando catálogo: " + archivoDestinoPdf.getName() + "...");
+                    System.out.println(dtf.format(LocalDateTime.now()) + ": " + productos + " productos han sido generados.");
+                    System.out.println(dtf.format(LocalDateTime.now()) + ": \"" + archivoDestinoPdf.getAbsolutePath() + "\" generado.");
                 } else {
-                    System.out.println(dtf.format(LocalDateTime.now()) + ": La ubicacion: " + carpetaDestinoFile.getAbsolutePath() + " no existe.");
+                    System.out.println(dtf.format(LocalDateTime.now()) + ": El archivo Excel de origen no existe o está vacío para: " + listaPrecios + " - " + mixProductos + (clasificacion.isBlank() ? "" : " - " + clasificacion));
                 }
+            } else {
+                System.out.println(dtf.format(LocalDateTime.now()) + ": La ubicacion: " + carpetaDestinoFile.getAbsolutePath() + " no existe.");
             }
-            System.out.println("------------------------------------------------------------------------------------------------------------------");
-            System.out.println(dtf.format(LocalDateTime.now()) + ": Proceso finalizado.");
         }
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
+        System.out.println(dtf.format(LocalDateTime.now()) + ": Proceso finalizado.");
     }
 
     private boolean isNumeric(String strNum) {
@@ -312,7 +307,7 @@ public class CommandLine {
             try (final OPCPackage pkg = OPCPackage.open(archivoOrigenExcel, PackageAccess.READ);
                  final XSSFWorkbook workbook = new XSSFWorkbook(pkg)) {
                 final Sheet sheet = workbook.getSheetAt(0); // 1° hoja
-                final int rows = PDFUtils.countRowsInFile(sheet, new StringBuilder());
+                final int rows = ExcelUtils.countRowsInFile(sheet, new StringBuilder());
                 if (rows < 2) {
                     return false;
                 }
@@ -327,14 +322,6 @@ public class CommandLine {
 
     private boolean validarCarpetaDestino(File carpetaDestino) {
         return carpetaDestino != null && carpetaDestino.isDirectory();
-    }
-
-    private boolean validarInputs() throws Exception {
-        if (isNumeric(pageWidthTextInput) && isNumeric(pageHeightTextInput)) {
-            return true;
-        } else {
-            throw new Exception("Los inputs pageWidth o pageHeight contienen valores inválidos.");
-        }
     }
 
     private boolean validarUbicaciones() throws Exception {

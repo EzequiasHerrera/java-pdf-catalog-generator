@@ -11,6 +11,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Table;
+import enums.PageType;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -18,12 +19,11 @@ import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import themes.KitchenToolsTheme;
-import themes.LineageTheme;
-import themes.Theme;
-import utils.BackgroundHandler;
-import utils.FooterHandler;
-import utils.PDFUtils;
+import pdf.*;
+import pdf.themes.KitchenToolsTheme;
+import pdf.themes.LineageTheme;
+import pdf.themes.Theme;
+import utils.*;
 
 import java.io.File;
 
@@ -36,8 +36,7 @@ public class PDFGenerator {
             File archivoDestino,
 
             float imageSize,
-            float pageWidth,
-            float pageHeight,
+            PageType pageType,
 
             boolean codigoColumn,
             boolean productoColumn,
@@ -64,8 +63,8 @@ public class PDFGenerator {
             final Sheet sheet = workbook.getSheetAt(0);
             final Row firstRow = sheet.getRow(0);
 
-            if (PDFUtils.isValidExcel(firstRow)) {
-                totalProducts = PDFUtils.countRowsInFile(sheet, log);
+            if (ExcelUtils.isValidExcel(firstRow)) {
+                totalProducts = ExcelUtils.countRowsInFile(sheet, log);
                 // EXCEL ----------------------------------------------
 
                 try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
@@ -78,7 +77,8 @@ public class PDFGenerator {
                     final ImageData backgroundImg = theme.backgroundImage;
                     final PdfFont font = PdfFontFactory.createFont(); // Fuente por defecto
                     final ImageData logoData = theme.logoImage; // Cargar logo desde recursos (classpath)
-
+                    final float pageWidth = pageType.getWidth();
+                    final float pageHeight = pageType.getHeight();
 
                     pdfDoc.addEventHandler(PdfDocumentEvent.START_PAGE, new BackgroundHandler(pdfDoc, backgroundFirstPageImg, backgroundImg, caratula)); // Agregar fondo a cada página
                     pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, new FooterHandler(font, logoData, caratula)); // Agregar pie de página a cada página
@@ -106,7 +106,7 @@ public class PDFGenerator {
                         while (itemsThisPage < productsPerPage && actualProductIndex <= totalProducts) {
 
                             final Row row = sheet.getRow(actualProductIndex);
-                            if (PDFUtils.isEmptyRow(row)) {
+                            if (ExcelUtils.isEmptyRow(row)) {
                                 actualProductIndex++;
                                 continue;
                             }

@@ -1,19 +1,20 @@
-package components;
+package pdf.components;
 
-import static utils.PDFStyleDefaults.BLACK_COLOR;
+import static pdf.PDFStyleDefaults.BLACK_COLOR;
 
 import org.apache.poi.ss.usermodel.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.element.Text;
 
-import themes.Theme;
+import pdf.themes.Theme;
+import utils.ExcelUtils;
 import utils.PDFUtils;
 
 public class PrecioComponent {
     public static Paragraph build(Cell cell, Theme theme) {
         try {
-            String precioText = PDFUtils.safeText(PDFUtils.getCellValue(cell), "--");
+            String precioText = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "--");
             String precioValue = PDFUtils.formatPrice(precioText);
 
             Text precioBold = new Text("$" + precioValue).simulateBold();

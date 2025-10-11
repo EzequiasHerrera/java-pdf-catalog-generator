@@ -1,7 +1,7 @@
-package components;
+package pdf.components;
 
-import static utils.PDFStyleDefaults.GRAY_COLOR;
-import static utils.PDFStyleDefaults.WHITE_COLOR;
+import static pdf.PDFStyleDefaults.GRAY_COLOR;
+import static pdf.PDFStyleDefaults.WHITE_COLOR;
 
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.layout.borders.SolidBorder;

@@ -1,6 +1,6 @@
-package components;
+package pdf.components;
 
-import static utils.PDFStyleDefaults.WHITE_COLOR;
+import static pdf.PDFStyleDefaults.WHITE_COLOR;
 
 import org.apache.poi.ss.usermodel.Cell;
 
@@ -8,13 +8,14 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.BorderRadius;
 import com.itextpdf.layout.properties.HorizontalAlignment;
 
-import themes.Theme;
+import pdf.themes.Theme;
+import utils.ExcelUtils;
 import utils.PDFUtils;
 
 public class CodigoComponent {
     public static Paragraph build(Cell cell, Theme theme, float availableWidthSpace) {
         try {
-            String codigoValue = PDFUtils.safeText(PDFUtils.getCellValue(cell), "[SIN CÓDIGO]");
+            String codigoValue = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "[SIN CÓDIGO]");
 
             // 🔧 Si termina en ".0", lo sacamos
             if (codigoValue.matches("^\\d+\\.0$")) {

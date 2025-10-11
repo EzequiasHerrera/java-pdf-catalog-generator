@@ -11,28 +11,27 @@ import javafx.scene.paint.Paint;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.log4j.BasicConfigurator;
-import service.GeneratePDFService;
-import themes.KitchenToolsTheme;
-import themes.LineageTheme;
-import utils.ProductQuantity;
+import pdf.themes.KitchenToolsTheme;
+import pdf.themes.LineageTheme;
+import enums.PageType;
+import enums.ProductQuantity;
 
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 //Implementar Initializable le permite ejecutar código cuando se abre la ventana
 public class VentanaController implements Initializable {
 
-    // Crea un InputTextBox
     @FXML
     private TextField ubicacionExcel;
     @FXML
     private TextField ubicacionImagenes;
-
     @FXML
     private TextField codigoFontSize; // CODIGO
     @FXML
@@ -41,6 +40,13 @@ public class VentanaController implements Initializable {
     private TextField precioFontSize; // PRECIO
     @FXML
     private TextField unidadPorBultoFontSize; // UXB
+
+    @FXML
+    private TextField pageWidthTextInput;
+    @FXML
+    private TextField pageHeightTextInput;
+    @FXML
+    private TextField imageSizeTextInput;
 
     // Muestra un dropbox con un selector de colores
     @FXML
@@ -53,16 +59,7 @@ public class VentanaController implements Initializable {
     private ColorPicker unidadPorBultoColorPicker; // UXB
 
     @FXML
-    private ComboBox<String> sheetSizeComboBox;
-
-    // Crea un InputBox donde ingresar tamaño de imagenes (SE PODRÍA SIMPLIFICAR CON
-    // A4 etc)
-    @FXML
-    private TextField imageSizeTextInput;
-    @FXML
-    private TextField pageWidthTextInput;
-    @FXML
-    private TextField pageHeightTextInput;
+    private ComboBox<String> pageTypeComboBox;
     @FXML
     private ComboBox<Integer> productoQuantityComboBox;
 
@@ -82,6 +79,8 @@ public class VentanaController implements Initializable {
     private CheckBox unidadPorBultoCheckBox; // UXB
     @FXML
     private CheckBox presupuestoCheckBox;
+    @FXML
+    private CheckBox imagenCheckBox;
 
     // THEMES
     @FXML
@@ -89,42 +88,32 @@ public class VentanaController implements Initializable {
     @FXML
     private Button kitchenButton;
 
-    private String selectedTheme = LineageTheme.THEME_NAME;
-
-    @FXML
-    private CheckBox imagenCheckBox;
-
     // Crea un area donde escribir texto
     @FXML
     private TextArea logTextArea;
-
     // Crea un botón
     @FXML
     private Button generarButton;
-
     // Barra que muestra el progreso
     @FXML
     private ProgressIndicator progressIndicator;
 
     // Archivo Excel
     private File archivoExcel;
-
-    // presupuesto o cliente
-    private boolean presupuestoActivo = false;
-
     // Directorio donde encontrar las imagenes
     private File carpetaImagenes;
-
-    // Determina si incluir o no caratula
-    private boolean caratula;
-
     // Directorio donde guardar NUEVO PDF
     private File archivoDestino;
+
+    // presupuesto o cliente
+    private boolean presupuestoActivo;
+    // Determina si incluir o no caratula
+    private boolean caratula;
+    private String selectedTheme;
 
     // Audios para error o success
     private AudioClip errorSound;
     private AudioClip successSound;
-
     // -------------------------------------------------------------------------------------------------//
 
     // Se ejecuta automáticamente cuando se carga la ventana
@@ -139,21 +128,10 @@ public class VentanaController implements Initializable {
 
     private void inicializarComponentes() {
 
-        productoQuantityComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal == null)
-                return;
-            try {
-                final String imageSize = ProductQuantity.fromQuantity(newVal).getImageSize();
-                imageSizeTextInput.setText(imageSize);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
         ubicacionImagenes.setTooltip(new Tooltip("Formatos de las imágenes: .jpg, .jpeg, .png y .bmp"));
 
-        sheetSizeComboBox.getItems().addAll("A4", "A3", "Carta");
-        productoQuantityComboBox.getItems().addAll(ProductQuantity.TWO.getQuantity(), ProductQuantity.FOUR.getQuantity(), ProductQuantity.TWELVE.getQuantity(), ProductQuantity.TWENTY.getQuantity());
+        pageTypeComboBox.getItems().addAll(Arrays.stream(PageType.values()).map(pageType -> pageType.name()).toArray(value -> new String[value]));
+        productoQuantityComboBox.getItems().addAll(Arrays.stream(ProductQuantity.values()).map(productQuantity -> productQuantity.getQuantity()).toArray(value -> new Integer[value]));
 
         errorSound = new AudioClip(getClass().getResource("/audios/error.mp3").toExternalForm());
         successSound = new AudioClip(getClass().getResource("/audios/success.mp3").toExternalForm());
@@ -168,6 +146,24 @@ public class VentanaController implements Initializable {
         if (carpetaImagenes.isDirectory()) {
             ubicacionImagenes.setText(carpetaImagenes.getAbsolutePath());
         }
+
+        // Listeners para actualizar valores automáticamente
+        pageTypeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            PageType pageType = PageType.valueOf(pageTypeComboBox.getValue());
+            pageWidthTextInput.setText(String.valueOf(pageType.getWidth()));
+            pageHeightTextInput.setText(String.valueOf(pageType.getHeight()));
+        });
+
+        productoQuantityComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null)
+                return;
+            try {
+                final String imageSize = String.valueOf(ProductQuantity.fromQuantity(newVal).getImageSize());
+                imageSizeTextInput.setText(imageSize);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         loadPreferences(); // Load previous state from preferences
     }
@@ -227,11 +223,8 @@ public class VentanaController implements Initializable {
 
         // -----------------VALORES POR DEFECTO DE TAMAÑO Y
         // FUENTE-------------------------------//
-        sheetSizeComboBox.setValue(prefs.get("sheetSize", "A4"));
-
-        imageSizeTextInput.setText(prefs.get("imageSizeTextInput", ProductQuantity.TWO.getImageSize()));
-        pageWidthTextInput.setText(prefs.get("pageWidthTextInput", "595"));
-        pageHeightTextInput.setText(prefs.get("pageHeightTextInput", "842"));
+//        imageSizeTextInput.setText(prefs.get("imageSizeTextInput", String.valueOf(ProductQuantity.TWO.getImageSize())));
+        pageTypeComboBox.setValue(prefs.get("pageTypeComboBox", "A4"));
 
         selectedTheme = prefs.get("selectedTheme", LineageTheme.THEME_NAME);
         changeButtonStyles(selectedTheme);
@@ -304,11 +297,8 @@ public class VentanaController implements Initializable {
                 unidadPorBultoColorPicker.getValue().getRed() + "," + unidadPorBultoColorPicker.getValue().getGreen()
                         + "," + unidadPorBultoColorPicker.getValue().getBlue());
 
-        prefs.put("sheetSize", sheetSizeComboBox.getValue());
-
-        prefs.put("imageSizeTextInput", imageSizeTextInput.getText());
-        prefs.put("pageWidthTextInput", pageWidthTextInput.getText());
-        prefs.put("pageHeightTextInput", pageHeightTextInput.getText());
+        prefs.put("pageTypeComboBox", pageTypeComboBox.getValue());
+//        prefs.put("imageSizeTextInput", imageSizeTextInput.getText());
 
         prefs.put("selectedTheme", selectedTheme.equals(LineageTheme.THEME_NAME) ? LineageTheme.THEME_NAME : KitchenToolsTheme.THEME_NAME);
 
@@ -353,8 +343,6 @@ public class VentanaController implements Initializable {
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Archivo XLSX", "*.xlsx"));
 
-        // ——— Leo la última ruta guardada ——— //
-
         // Busco la ultima ruta guardada en el sistema
         final File lastPath = new File(prefs.get("ubicacionExcel", ""));
 
@@ -368,7 +356,6 @@ public class VentanaController implements Initializable {
 
         if (archivoExcel != null) {
             ubicacionExcel.setText(archivoExcel.getAbsolutePath());
-
             // ✅ Guardo la ruta seleccionada
             prefs.put("ubicacionExcel", archivoExcel.getAbsolutePath());
         } else {
@@ -413,8 +400,7 @@ public class VentanaController implements Initializable {
                     GeneratePDFService service = new GeneratePDFService(
                             archivoExcel, carpetaImagenes, caratula, archivoDestino,
                             Float.parseFloat(imageSizeTextInput.getText()),
-                            Float.parseFloat(pageWidthTextInput.getText()),
-                            Float.parseFloat(pageHeightTextInput.getText()),
+                            PageType.valueOf(pageTypeComboBox.getValue()),
                             codigoCheckBox.isSelected(), productoCheckBox.isSelected(), precioCheckBox.isSelected(),
                             unidadPorBultoCheckBox.isSelected(), imagenCheckBox.isSelected(), logTextArea,
                             productoQuantityComboBox.getValue(), titleTextInput.getText(), subtitleTextInput.getText(),
@@ -514,26 +500,6 @@ public class VentanaController implements Initializable {
         unidadPorBultoCheckBox.setTextFill(Paint.valueOf((unidadPorBultoColorPicker.getValue().toString())));
     }
 
-    // -----------------------------------------------------//
-    @FXML
-    public void onSheetSizeChange(Event event) {
-        String selectedSheetSize = sheetSizeComboBox.getValue();
-
-        switch (selectedSheetSize) {
-            case "A4":
-                pageWidthTextInput.setText("595");
-                pageHeightTextInput.setText("842");
-                break;
-            case "A3":
-                pageWidthTextInput.setText("842");
-                pageHeightTextInput.setText("1190");
-                break;
-            case "Carta":
-                pageWidthTextInput.setText("612");
-                pageHeightTextInput.setText("792");
-                break;
-        }
-    }
     // ---------------------VALIDACIONES ETC-------------------------------//
 
     private void deshabilitarColumna(CheckBox checkBox, TextField fontSize, ColorPicker colorPicker) {

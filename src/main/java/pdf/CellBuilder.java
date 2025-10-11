@@ -1,14 +1,14 @@
-package service;
+package pdf;
 
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
-import components.*;
+import pdf.components.*;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import themes.Theme;
+import pdf.themes.Theme;
 
 import java.io.File;
 

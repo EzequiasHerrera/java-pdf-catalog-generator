@@ -1,4 +1,4 @@
-package themes;
+package pdf.themes;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.kernel.colors.Color;
