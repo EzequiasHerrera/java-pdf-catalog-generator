@@ -10,10 +10,10 @@ public class PDFStyleDefaults {
     public static final String BASE_FONT_BOLD = "Helvetica-Bold";
 
     // Tamaños de fuente
-    public static final float FONT_SIZE_CODIGO = 12f;
-    public static final float FONT_SIZE_PRODUCTO = 11f;
-    public static final float FONT_SIZE_PRECIO = 12f;
-    public static final float FONT_SIZE_UXB = 11f;
+    public static final float FONT_SIZE_CODIGO = 6;
+    public static final float FONT_SIZE_PRODUCTO = 6;
+    public static final float FONT_SIZE_PRECIO = 7;
+    public static final float FONT_SIZE_UXB = 6;
 
     // Color por defecto para el texto
     public static final Color BASE_COLOR = ColorConstants.BLACK;

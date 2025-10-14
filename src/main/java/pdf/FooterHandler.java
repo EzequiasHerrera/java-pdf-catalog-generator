@@ -15,13 +15,11 @@ public class FooterHandler extends AbstractPdfDocumentEventHandler {
 
     private final PdfFont font;
     private final ImageData logoData;
-
     private final boolean caratula;
 
     public FooterHandler(PdfFont font, ImageData logoData, boolean caratula) {
         this.font = font;
         this.logoData = logoData;
-
         this.caratula = caratula;
     }
 
@@ -56,7 +54,7 @@ public class FooterHandler extends AbstractPdfDocumentEventHandler {
                 .endText();
 
         // Imagen
-        Rectangle rect = new Rectangle(logoX, y - (25 / 2), 30, 25);
+        Rectangle rect = new Rectangle(logoX, y - ((float) 25 / 2), 30, 25);
         canvas.addImageFittedIntoRectangle(logoData, rect, false);
     }
 

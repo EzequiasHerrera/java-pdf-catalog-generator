@@ -19,7 +19,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="503.0" minWidth="461.0" prefHeight="557.0" prefWidth="461.0" style="-fx-background-color: #242831;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fx.VentanaController">
+<AnchorPane minHeight="503.0" minWidth="461.0" prefHeight="593.0" prefWidth="472.0" style="-fx-background-color: #242831;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fx.VentanaController">
    <children>
       
       <ProgressIndicator fx:id="progressIndicator" layoutX="200.0" layoutY="525.0" prefHeight="30.0" prefWidth="30.0" progress="0.0" scaleX="15.0" scaleY="0.5" visible="false" />
@@ -52,7 +52,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </ColorPicker>
-                  <Label layoutX="44.0" layoutY="8.0" prefHeight="17.0" prefWidth="69.0" text="CÓDIGO" textFill="WHITE">
+                  <Label layoutX="44.0" layoutY="8.0" prefHeight="17.0" prefWidth="69.0" text="CODIGO" textFill="WHITE">
                      <font>
                         <Font name="Arial Bold" size="15.0" />
                      </font>
@@ -157,7 +157,7 @@
             </Group>
          </children>
       </Pane>
-      <Pane layoutX="20.0" layoutY="24.0" prefHeight="64.0" prefWidth="428.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">
+      <Pane layoutX="20.0" layoutY="24.0" prefHeight="64.0" prefWidth="435.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">
          <children>
             <Group layoutX="4.0" layoutY="10.0">
                <children>
@@ -171,7 +171,7 @@
                      </opaqueInsets>
                   </TextField>
             
-                              <Button alignment="CENTER" contentDisplay="CENTER" ellipsisString="" graphicTextGap="0.0" layoutX="6.0" layoutY="15.899999618530273" minWidth="20.0" mnemonicParsing="false" onAction="#buscarExcel" opacity="0.0" prefHeight="24.0" prefWidth="200.0" textFill="#00a40b">
+                              <Button alignment="CENTER" contentDisplay="CENTER" ellipsisString="" graphicTextGap="0.0" layoutX="6.0" layoutY="15.899999618530273" minWidth="20.0" mnemonicParsing="false" onAction="#buscarExcel" opacity="0.0" prefHeight="24.0" prefWidth="200.0" textFill="#00a40b" wrapText="true">
                      <font>
                         <Font name="System Bold" size="17.0" />
                      </font>
@@ -180,7 +180,7 @@
                      </cursor>
                   </Button>
             
-                              <Label layoutX="3.0" layoutY="-1.0" prefHeight="0.0" prefWidth="72.0" text="Excel file: " textFill="WHITE">
+                              <Label layoutX="3.0" layoutY="-1.0" prefHeight="16.0" prefWidth="105.0" text="Archivo excel:" textFill="WHITE">
                      <font>
                         <Font name="Arial Bold" size="13.0" />
                      </font>
@@ -201,7 +201,7 @@
                      </font>
                   </TextField>
             
-                              <Button layoutX="40.0" layoutY="34.0" mnemonicParsing="false" onAction="#buscarImagenes" opacity="0.0" prefHeight="26.0" prefWidth="202.0" textFill="#d9b247">
+                              <Button layoutX="40.0" layoutY="34.0" mnemonicParsing="false" onAction="#buscarImagenes" opacity="0.0" prefHeight="26.0" prefWidth="202.0" textFill="#d9b247" wrapText="true">
                      <font>
                         <Font name="System Bold" size="17.0" />
                      </font>
@@ -215,7 +215,7 @@
                      </image>
                   </ImageView>
             
-                                    <Label layoutX="40.0" layoutY="17.0" prefHeight="16.0" prefWidth="116.0" text="Image folder:" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+                                    <Label layoutX="40.0" layoutY="17.0" prefHeight="16.0" prefWidth="165.0" text="Carpeta imágenes:" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                      <font>
                         <Font name="Arial Bold" size="13.0" />
                      </font>
@@ -225,9 +225,9 @@
          </children>
       </Pane>
       
-                        <Button fx:id="generarButton" alignment="CENTER" layoutX="129.0" layoutY="516.0" mnemonicParsing="false" onAction="#generarCatalogo" prefHeight="30.0" prefWidth="198.0" style="-fx-background-color: #514398; -fx-background-radius: 5;" text="Generar PDF" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+                        <Button fx:id="generarButton" alignment="CENTER" layoutX="140.0" layoutY="546.0" mnemonicParsing="false" onAction="#generarCatalogo" prefHeight="30.0" prefWidth="198.0" style="-fx-background-color: #514398; -fx-background-radius: 5;" text="Generar PDF" textAlignment="CENTER" textFill="WHITE" wrapText="true">
          <font>
-            <Font name="Rockwell Bold" size="17.0" />
+            <Font name="Consolas Bold" size="20.0" />
          </font>
          <opaqueInsets>
             <Insets />
@@ -236,13 +236,13 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Label layoutX="26.0" layoutY="92.0" prefHeight="0.0" prefWidth="72.0" text="Logs:" textFill="WHITE">
+      <Label layoutX="20.0" layoutY="92.0" prefHeight="0.0" prefWidth="72.0" text="Logs:" textFill="WHITE">
          <font>
             <Font name="Arial Bold" size="13.0" />
          </font>
       </Label>
 
-                        <TextArea fx:id="logTextArea" editable="false" layoutX="20.0" layoutY="109.0" prefHeight="105.0" prefWidth="428.0" style="-fx-background-radius: 20; -fx-background-color: #242831;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="109.0">
+                        <TextArea fx:id="logTextArea" editable="false" layoutX="20.0" layoutY="109.0" prefHeight="106.0" prefWidth="435.0" style="-fx-background-radius: 20; -fx-background-color: #242831;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="109.0">
          <font>
             <Font name="Roboto" size="14.0" />
          </font>
@@ -252,9 +252,9 @@
       </TextArea>
       <Group layoutX="302.0" layoutY="347.0">
          <children>
-            <Pane layoutX="-4.0" layoutY="5.0" prefHeight="155.0" prefWidth="155.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">
+            <Pane layoutX="-4.0" layoutY="5.0" prefHeight="182.0" prefWidth="155.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">
                <children>
-                  <ComboBox fx:id="pageTypeComboBox" layoutX="13.0" layoutY="119.0" prefHeight="26.0" prefWidth="130.0" />
+                  <ComboBox fx:id="pageTypeComboBox" layoutX="13.0" layoutY="136.0" prefHeight="26.0" prefWidth="130.0" />
                </children></Pane>
             <ImageView fitHeight="19.0" fitWidth="19.0" layoutX="2.0" layoutY="9.0" preserveRatio="true" smooth="false">
                <image>
@@ -262,25 +262,25 @@
                </image>
             </ImageView>
             
-                  <TextField fx:id="pageWidthTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="42.399993896484375" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
+                  <TextField fx:id="pageWidthTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="52.399993896484375" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
                <font>
                   <Font size="15.0" />
                </font>
             </TextField>
             
-                  <TextField fx:id="pageHeightTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="82.39999389648438" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
+                  <TextField fx:id="pageHeightTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="92.39999389648438" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
                <font>
                   <Font size="15.0" />
                </font>
             </TextField>
             
-                  <Label layoutX="17.0" layoutY="39.399993896484375" prefHeight="35.0" prefWidth="53.0" text="Ancho:" textFill="WHITE">
+                  <Label layoutX="17.0" layoutY="49.399993896484375" prefHeight="35.0" prefWidth="53.0" text="Ancho:" textFill="WHITE">
                <font>
                   <Font name="Arial" size="15.0" />
                </font>
             </Label>
 
-                        <Label layoutX="34.0" layoutY="78.0" prefHeight="35.0" prefWidth="43.0" text="Alto:" textFill="WHITE">
+                        <Label layoutX="34.0" layoutY="88.0" prefHeight="35.0" prefWidth="43.0" text="Alto:" textFill="WHITE">
                <font>
                   <Font name="Arial" size="15.0" />
                </font>
@@ -338,28 +338,38 @@
                </font>
             </Label>
          </children></Pane>
-      <Pane layoutX="19.0" layoutY="427.0" prefHeight="80.0" prefWidth="275.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">
+      <Pane layoutX="19.0" layoutY="427.0" prefHeight="106.0" prefWidth="275.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">
          <children>
-            <Label layoutX="7.0" layoutY="3.0" prefHeight="17.0" prefWidth="45.0" text="Título" textFill="WHITE">
+            <Label layoutX="7.0" layoutY="34.0" prefHeight="17.0" prefWidth="75.0" text="TITULO" textFill="WHITE">
                <font>
                   <Font name="Arial Bold" size="15.0" />
                </font>
             </Label>
-            <TextField fx:id="titleTextInput" alignment="TOP_LEFT" layoutX="6.0" layoutY="22.0" prefHeight="47.0" prefWidth="116.0" promptText="Ingresa título" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
+            <TextField fx:id="titleTextInput" alignment="TOP_LEFT" layoutX="6.0" layoutY="55.0" prefHeight="47.0" prefWidth="116.0" promptText="Ingresa título" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
                <font>
                   <Font name="Arial" size="15.0" />
                </font>
             </TextField>
-            <Label layoutX="130.0" layoutY="3.0" prefHeight="17.0" prefWidth="72.0" text="Subtítulo" textFill="WHITE">
+            <Label layoutX="130.0" layoutY="33.0" prefHeight="17.0" prefWidth="109.0" text="SUBTITULO" textFill="WHITE">
                <font>
                   <Font name="Arial Bold" size="15.0" />
                </font>
             </Label>
-            <TextField fx:id="subtitleTextInput" alignment="TOP_LEFT" layoutX="128.0" layoutY="22.0" prefHeight="47.0" prefWidth="141.0" promptText="Ingresa subtítulo" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
+            <TextField fx:id="subtitleTextInput" alignment="TOP_LEFT" layoutX="128.0" layoutY="55.0" prefHeight="47.0" prefWidth="141.0" promptText="Ingresa subtítulo" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
                <font>
                   <Font name="Arial" size="15.0" />
                </font>
             </TextField>
+            <Label layoutX="93.0" layoutY="8.0" prefHeight="17.0" prefWidth="116.0" text="CARATULA" textFill="WHITE">
+               <font>
+                  <Font name="Arial Bold" size="15.0" />
+               </font>
+            </Label>
+            <CheckBox fx:id="caratulaCheckBox" layoutX="67.0" layoutY="6.0" mnemonicParsing="false" onAction="#onClickCaratulaCheckBox" prefHeight="0.0" prefWidth="26.0" selected="true" textFill="WHITE">
+               <font>
+                  <Font name="Roboto" size="15.0" />
+               </font>
+            </CheckBox>
          </children></Pane>
       <Button fx:id="kitchenButton" layoutX="120.0" layoutY="223.0" mnemonicParsing="false" onAction="#onClickTheme" prefHeight="45.0" prefWidth="87.0" style="-fx-background-color: #444;">
          <graphic>
@@ -385,14 +395,14 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Pane layoutX="212.0" layoutY="222.0" prefHeight="47.0" prefWidth="236.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">
+      <Pane layoutX="212.0" layoutY="223.0" prefHeight="47.0" prefWidth="242.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">
          <children>
-            <Label layoutX="73.0" layoutY="14.0" prefHeight="17.0" prefWidth="116.0" text="PRESUPUESTO" textFill="WHITE">
+            <Label layoutX="73.0" layoutY="15.0" prefHeight="17.0" prefWidth="116.0" text="PRESUPUESTO" textFill="WHITE">
                <font>
                   <Font name="Arial Bold" size="15.0" />
                </font>
             </Label>
-            <CheckBox fx:id="presupuestoCheckBox" layoutX="47.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickPresupuestoCheckBox" prefHeight="0.0" prefWidth="26.0" selected="true" textFill="WHITE">
+            <CheckBox fx:id="presupuestoCheckBox" layoutX="47.0" layoutY="13.0" mnemonicParsing="false" prefHeight="0.0" prefWidth="26.0" textFill="WHITE">
                <font>
                   <Font name="Roboto" size="15.0" />
                </font>

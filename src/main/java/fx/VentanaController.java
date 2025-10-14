@@ -11,6 +11,7 @@ import javafx.scene.paint.Paint;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.log4j.BasicConfigurator;
+import pdf.PDFStyleDefaults;
 import pdf.themes.KitchenToolsTheme;
 import pdf.themes.LineageTheme;
 import enums.PageType;
@@ -81,6 +82,8 @@ public class VentanaController implements Initializable {
     private CheckBox presupuestoCheckBox;
     @FXML
     private CheckBox imagenCheckBox;
+    @FXML
+    private CheckBox caratulaCheckBox;
 
     // THEMES
     @FXML
@@ -106,9 +109,6 @@ public class VentanaController implements Initializable {
     private File archivoDestino;
 
     // presupuesto o cliente
-    private boolean presupuestoActivo;
-    // Determina si incluir o no caratula
-    private boolean caratula;
     private String selectedTheme;
 
     // Audios para error o success
@@ -139,14 +139,6 @@ public class VentanaController implements Initializable {
         errorSound.setVolume(0.1);
         successSound.setVolume(0.1);
 
-        caratula = true; // Siempre con caratula. TODO: agregar opción en interfaz
-
-        carpetaImagenes = new File("Z:\\Doc. Compartidos\\DUX ERP Linea GE\\IMAGENES (subidas a la Web)");
-
-        if (carpetaImagenes.isDirectory()) {
-            ubicacionImagenes.setText(carpetaImagenes.getAbsolutePath());
-        }
-
         // Listeners para actualizar valores automáticamente
         pageTypeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             PageType pageType = PageType.valueOf(pageTypeComboBox.getValue());
@@ -172,39 +164,38 @@ public class VentanaController implements Initializable {
         // CREO UN SISTEMA DE PREFERENCIAS CON NOMBRE catalogo
         final Preferences prefs = Preferences.userRoot().node("catalogo");
 
-        codigoFontSize.setText(prefs.get("codigoFontSize", "6"));
-        productoFontSize.setText(prefs.get("productoFontSize", "6"));
-        precioFontSize.setText(prefs.get("precioFontSize", "7"));
-        unidadPorBultoFontSize.setText(prefs.get("unidadPorBultoFontSize", "6"));
-        productoQuantityComboBox.setValue(prefs.getInt("productoQuantityTextInput", 12));
-        presupuestoCheckBox.setSelected(prefs.getBoolean("presupuestoCheckBox", false));
-        presupuestoActivo = presupuestoCheckBox.isSelected(); // Actualiza el valor
+        codigoFontSize.setText(prefs.get("codigoFontSize", String.valueOf(PDFStyleDefaults.FONT_SIZE_CODIGO)));
+        productoFontSize.setText(prefs.get("productoFontSize", String.valueOf(PDFStyleDefaults.FONT_SIZE_PRODUCTO)));
+        precioFontSize.setText(prefs.get("precioFontSize", String.valueOf(PDFStyleDefaults.FONT_SIZE_PRECIO)));
+        unidadPorBultoFontSize.setText(prefs.get("unidadPorBultoFontSize", String.valueOf(PDFStyleDefaults.FONT_SIZE_UXB)));
 
-        titleTextInput.setText(prefs.get("titleTextInput", "TITULO"));
+        productoQuantityComboBox.setValue(prefs.getInt("productoQuantityTextInput", ProductQuantity.TWELVE.getQuantity()));
+        presupuestoCheckBox.setSelected(prefs.getBoolean("presupuestoCheckBox", false));
+
+        titleTextInput.setText(prefs.get("titleTextInput", ""));
         subtitleTextInput.setText(prefs.get("subtitleTextInput", ""));
 
         // Cargo ubicacion de archivos de preferencias-----------------------
 
         // EXCEL
         String excelPath = prefs.get("ubicacionExcel", "");
-        ubicacionExcel.setText(excelPath);
-
         archivoExcel = new File(excelPath);
-        if (!archivoExcel.exists() || archivoExcel.isDirectory()) {
+        if (archivoExcel.isFile()) {
+            ubicacionExcel.setText(archivoExcel.getAbsolutePath());
+        } else {
             archivoExcel = null;
         }
 
         // IMAGENES
         String imgPath = prefs.get("ubicacionImagenes", "");
-        ubicacionImagenes.setText(imgPath);
-
         carpetaImagenes = new File(imgPath);
-        if (!carpetaImagenes.exists() || !carpetaImagenes.isDirectory()) {
+        if (carpetaImagenes.isDirectory()) {
+            ubicacionImagenes.setText(carpetaImagenes.getAbsolutePath());
+        } else {
             carpetaImagenes = null;
         }
         // Termino de cargar archivos de preferencias------------------------
 
-        // --------------------------------------------------------//
         final String[] codigoColor = prefs.get("codigoColorPicker", "0,0,0").split(",");
         codigoColorPicker.setValue(new Color(Double.parseDouble(codigoColor[0]), Double.parseDouble(codigoColor[1]),
                 Double.parseDouble(codigoColor[2]), 1));
@@ -223,7 +214,7 @@ public class VentanaController implements Initializable {
 
         // -----------------VALORES POR DEFECTO DE TAMAÑO Y
         // FUENTE-------------------------------//
-//        imageSizeTextInput.setText(prefs.get("imageSizeTextInput", String.valueOf(ProductQuantity.TWO.getImageSize())));
+
         pageTypeComboBox.setValue(prefs.get("pageTypeComboBox", "A4"));
 
         selectedTheme = prefs.get("selectedTheme", LineageTheme.THEME_NAME);
@@ -232,6 +223,12 @@ public class VentanaController implements Initializable {
         // -------------------INHABILITAR OPCIONES AL
         // DESTILDAR-------------------------------------//
         presupuestoCheckBox.setSelected(prefs.getBoolean("presupuestoCheckBox", false));
+
+        caratulaCheckBox.setSelected(prefs.getBoolean("caratulaCheckBox", true));
+        if (!caratulaCheckBox.isSelected()) {
+            titleTextInput.setDisable(true);
+            subtitleTextInput.setDisable(true);
+        }
 
         codigoCheckBox.setSelected(prefs.getBoolean("codigoCheckBox", true));
         if (!codigoCheckBox.isSelected()) {
@@ -279,7 +276,6 @@ public class VentanaController implements Initializable {
         prefs.put("productoFontSize", productoFontSize.getText());
         prefs.put("precioFontSize", precioFontSize.getText());
         prefs.put("unidadPorBultoFontSize", unidadPorBultoFontSize.getText());
-        // prefs.put("productoQuantityTextInput", productoQuantityTextInput.getText());
         prefs.putInt("productoQuantityTextInput", productoQuantityComboBox.getValue());
         prefs.put("titleTextInput", titleTextInput.getText());
         prefs.put("subtitleTextInput", subtitleTextInput.getText());
@@ -298,28 +294,23 @@ public class VentanaController implements Initializable {
                         + "," + unidadPorBultoColorPicker.getValue().getBlue());
 
         prefs.put("pageTypeComboBox", pageTypeComboBox.getValue());
-//        prefs.put("imageSizeTextInput", imageSizeTextInput.getText());
 
         prefs.put("selectedTheme", selectedTheme.equals(LineageTheme.THEME_NAME) ? LineageTheme.THEME_NAME : KitchenToolsTheme.THEME_NAME);
 
         prefs.putBoolean("presupuestoCheckBox", presupuestoCheckBox.isSelected());
-
+        prefs.putBoolean("caratulaCheckBox", caratulaCheckBox.isSelected());
         prefs.putBoolean("codigoCheckBox", codigoCheckBox.isSelected());
         prefs.putBoolean("productoCheckBox", productoCheckBox.isSelected());
         prefs.putBoolean("precioCheckBox", precioCheckBox.isSelected());
         prefs.putBoolean("unidadPorBultoCheckBox", unidadPorBultoCheckBox.isSelected());
-
         prefs.putBoolean("imagenCheckBox", imagenCheckBox.isSelected());
     }
 
     @FXML
     public void onClickTheme(ActionEvent event) {
         Object source = event.getSource();
-
         selectedTheme = (source == lineageButton) ? LineageTheme.THEME_NAME : KitchenToolsTheme.THEME_NAME;
         changeButtonStyles(selectedTheme);
-
-        System.out.println("Tema seleccionado: " + selectedTheme);
     }
 
     private void changeButtonStyles(String selectedTheme) {
@@ -346,7 +337,7 @@ public class VentanaController implements Initializable {
         // Busco la ultima ruta guardada en el sistema
         final File lastPath = new File(prefs.get("ubicacionExcel", ""));
 
-        if (!lastPath.exists() || !lastPath.isDirectory()) {
+        if (!lastPath.isDirectory()) {
             fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         } else {
             fileChooser.setInitialDirectory(lastPath);
@@ -373,7 +364,7 @@ public class VentanaController implements Initializable {
         directoryChooser.setTitle("Selecciona la carpeta donde están las imágenes");
         final File lastPath = new File(prefs.get("ubicacionImagenes", ""));
 
-        if (!lastPath.exists() || !lastPath.isDirectory()) {
+        if (!lastPath.isDirectory()) {
             directoryChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         } else {
             directoryChooser.setInitialDirectory(lastPath);
@@ -393,18 +384,18 @@ public class VentanaController implements Initializable {
     @FXML
     public void generarCatalogo(ActionEvent event) {
         logTextArea.clear();
-        if (archivoExcel != null && archivoExcel.isFile() && carpetaImagenes != null && carpetaImagenes.exists()) {
+        if (archivoExcel != null && archivoExcel.isFile() && carpetaImagenes != null && carpetaImagenes.isDirectory()) {
             if (validarTextInputs()) {
                 if (elegirDestino()) {
                     // ACA LLAMA AL GENERADOR DEL PDF
                     GeneratePDFService service = new GeneratePDFService(
-                            archivoExcel, carpetaImagenes, caratula, archivoDestino,
+                            archivoExcel, carpetaImagenes, caratulaCheckBox.isSelected(), archivoDestino,
                             Float.parseFloat(imageSizeTextInput.getText()),
                             PageType.valueOf(pageTypeComboBox.getValue()),
                             codigoCheckBox.isSelected(), productoCheckBox.isSelected(), precioCheckBox.isSelected(),
                             unidadPorBultoCheckBox.isSelected(), imagenCheckBox.isSelected(), logTextArea,
                             productoQuantityComboBox.getValue(), titleTextInput.getText(), subtitleTextInput.getText(),
-                            selectedTheme, presupuestoActivo);
+                            selectedTheme, presupuestoCheckBox.isSelected());
 
                     service.setOnRunning(e -> {
                         generarButton.setDisable(true);
@@ -453,9 +444,16 @@ public class VentanaController implements Initializable {
 
     // -----------------------------------------------------//
     @FXML
-    public void onClickPresupuestoCheckBox(Event event) {
-        presupuestoActivo = presupuestoCheckBox.isSelected();
-        System.out.println(presupuestoActivo);
+    public void onClickCaratulaCheckBox(Event event) {
+        if (caratulaCheckBox.isSelected()) {
+            presupuestoCheckBox.setDisable(false);
+            titleTextInput.setDisable(false);
+            subtitleTextInput.setDisable(false);
+        } else {
+            presupuestoCheckBox.setDisable(true);
+            titleTextInput.setDisable(true);
+            subtitleTextInput.setDisable(true);
+        }
     }
 
     @FXML
