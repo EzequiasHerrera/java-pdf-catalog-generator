@@ -262,13 +262,13 @@
                </image>
             </ImageView>
             
-                  <TextField fx:id="pageWidthTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="52.399993896484375" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
+                  <TextField fx:id="pageWidthTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="52.399993896484375" mouseTransparent="true" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
                <font>
                   <Font size="15.0" />
                </font>
             </TextField>
             
-                  <TextField fx:id="pageHeightTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="92.39999389648438" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
+                  <TextField fx:id="pageHeightTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="92.39999389648438" mouseTransparent="true" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;">
                <font>
                   <Font size="15.0" />
                </font>
@@ -314,7 +314,7 @@
                      </font>
                   </Label>
                   
-                        <TextField fx:id="imageSizeTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="34.0" prefHeight="30.0" prefWidth="71.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;" text="100">
+                        <TextField fx:id="imageSizeTextInput" alignment="CENTER" editable="false" layoutX="65.0" layoutY="34.0" mouseTransparent="true" prefHeight="30.0" prefWidth="71.0" style="-fx-text-fill: #ffffff; -fx-background-color: #2c3039; -fx-background-radius: 5;" text="100">
                      <font>
                         <Font name="Arial Bold" size="15.0" />
                      </font>
