@@ -169,7 +169,7 @@ public class VentanaController implements Initializable {
         precioFontSize.setText(prefs.get("precioFontSize", String.valueOf(PDFStyleDefaults.FONT_SIZE_PRECIO)));
         unidadPorBultoFontSize.setText(prefs.get("unidadPorBultoFontSize", String.valueOf(PDFStyleDefaults.FONT_SIZE_UXB)));
 
-        productoQuantityComboBox.setValue(prefs.getInt("productoQuantityTextInput", ProductQuantity.TWELVE.getQuantity()));
+        productoQuantityComboBox.setValue(prefs.getInt("productoQuantityComboBox", ProductQuantity.TWELVE.getQuantity()));
         presupuestoCheckBox.setSelected(prefs.getBoolean("presupuestoCheckBox", false));
 
         titleTextInput.setText(prefs.get("titleTextInput", ""));
@@ -228,6 +228,7 @@ public class VentanaController implements Initializable {
         if (!caratulaCheckBox.isSelected()) {
             titleTextInput.setDisable(true);
             subtitleTextInput.setDisable(true);
+            presupuestoCheckBox.setDisable(true);
         }
 
         codigoCheckBox.setSelected(prefs.getBoolean("codigoCheckBox", true));
@@ -276,7 +277,7 @@ public class VentanaController implements Initializable {
         prefs.put("productoFontSize", productoFontSize.getText());
         prefs.put("precioFontSize", precioFontSize.getText());
         prefs.put("unidadPorBultoFontSize", unidadPorBultoFontSize.getText());
-        prefs.putInt("productoQuantityTextInput", productoQuantityComboBox.getValue());
+        prefs.putInt("productoQuantityComboBox", productoQuantityComboBox.getValue());
         prefs.put("titleTextInput", titleTextInput.getText());
         prefs.put("subtitleTextInput", subtitleTextInput.getText());
 
@@ -289,9 +290,8 @@ public class VentanaController implements Initializable {
                 + productoColorPicker.getValue().getGreen() + "," + productoColorPicker.getValue().getBlue());
         prefs.put("precioColorPicker", precioColorPicker.getValue().getRed() + ","
                 + precioColorPicker.getValue().getGreen() + "," + precioColorPicker.getValue().getBlue());
-        prefs.put("unidadPorBultoColorPicker",
-                unidadPorBultoColorPicker.getValue().getRed() + "," + unidadPorBultoColorPicker.getValue().getGreen()
-                        + "," + unidadPorBultoColorPicker.getValue().getBlue());
+        prefs.put("unidadPorBultoColorPicker", unidadPorBultoColorPicker.getValue().getRed() + "," + unidadPorBultoColorPicker.getValue().getGreen()
+                + "," + unidadPorBultoColorPicker.getValue().getBlue());
 
         prefs.put("pageTypeComboBox", pageTypeComboBox.getValue());
 

@@ -21,8 +21,6 @@
 
 <AnchorPane minHeight="503.0" minWidth="461.0" prefHeight="593.0" prefWidth="472.0" style="-fx-background-color: #242831;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fx.VentanaController">
    <children>
-      
-      <ProgressIndicator fx:id="progressIndicator" layoutX="200.0" layoutY="525.0" prefHeight="30.0" prefWidth="30.0" progress="0.0" scaleX="15.0" scaleY="0.5" visible="false" />
       <Pane layoutX="20.0" layoutY="272.0" prefHeight="74.0" prefWidth="428.0" AnchorPane.bottomAnchor="199.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="272.0">
          <children>
             <Pane layoutX="-2.0" layoutY="4.0" prefHeight="72.0" prefWidth="435.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;" />
@@ -162,7 +160,7 @@
             <Group layoutX="4.0" layoutY="10.0">
                <children>
             
-                              <TextField fx:id="ubicacionExcel" editable="false" layoutX="3.0" layoutY="15.899999618530273" prefHeight="24.0" prefWidth="200.0" promptText="Lista.xlsx" style="-fx-padding: 0 0 0 35; -fx-background-color: #242831; -fx-text-fill: white;">
+                              <TextField fx:id="ubicacionExcel" editable="false" layoutY="16.0" prefHeight="24.0" prefWidth="210.0" promptText="Lista.xlsx" style="-fx-padding: 0 0 0 35; -fx-background-color: #242831; -fx-text-fill: white;">
                      <font>
                         <Font name="Roboto" size="15.0" />
                      </font>
@@ -171,7 +169,7 @@
                      </opaqueInsets>
                   </TextField>
             
-                              <Button alignment="CENTER" contentDisplay="CENTER" ellipsisString="" graphicTextGap="0.0" layoutX="6.0" layoutY="15.899999618530273" minWidth="20.0" mnemonicParsing="false" onAction="#buscarExcel" opacity="0.0" prefHeight="24.0" prefWidth="200.0" textFill="#00a40b" wrapText="true">
+                              <Button alignment="CENTER" contentDisplay="CENTER" ellipsisString="" graphicTextGap="0.0" layoutX="5.0" layoutY="15.899999618530273" mnemonicParsing="false" onAction="#buscarExcel" opacity="0.0" prefHeight="24.0" prefWidth="210.0" textFill="#00a40b" wrapText="true">
                      <font>
                         <Font name="System Bold" size="17.0" />
                      </font>
@@ -192,16 +190,16 @@
                   </ImageView>
                </children>
             </Group>
-            <Group layoutX="176.0" layoutY="-8.0">
+            <Group layoutX="180.0" layoutY="-9.0">
                <children>
             
-                                    <TextField fx:id="ubicacionImagenes" editable="false" layoutX="40.0" layoutY="35.0" prefHeight="23.0" prefWidth="200.0" promptText="/path/images" style="-fx-padding: 0 0 0 35; -fx-background-color: #242831; -fx-text-fill: white;">
+                                    <TextField fx:id="ubicacionImagenes" editable="false" layoutX="40.0" layoutY="35.0" prefHeight="24.0" prefWidth="210.0" promptText="/path/images" style="-fx-padding: 0 0 0 35; -fx-background-color: #242831; -fx-text-fill: white;">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </TextField>
             
-                              <Button layoutX="40.0" layoutY="34.0" mnemonicParsing="false" onAction="#buscarImagenes" opacity="0.0" prefHeight="26.0" prefWidth="202.0" textFill="#d9b247" wrapText="true">
+                              <Button layoutX="41.0" layoutY="34.0" mnemonicParsing="false" onAction="#buscarImagenes" opacity="0.0" prefHeight="24.0" prefWidth="210.0" textFill="#d9b247" wrapText="true">
                      <font>
                         <Font name="System Bold" size="17.0" />
                      </font>
@@ -409,5 +407,7 @@
             </CheckBox>
          </children>
       </Pane>
+      
+            <ProgressIndicator fx:id="progressIndicator" layoutX="142.0" layoutY="545.0" prefHeight="40.0" prefWidth="32.0" visible="false" />
    </children>
 </AnchorPane>
