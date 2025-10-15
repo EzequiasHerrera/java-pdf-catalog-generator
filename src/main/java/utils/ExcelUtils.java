@@ -4,8 +4,6 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 
-import java.util.Map;
-
 public class ExcelUtils {
 
     // Función que detecta si una fila está vacía
@@ -76,14 +74,6 @@ public class ExcelUtils {
             throw new Exception("Verifique que la hoja tenga los 4 encabezados en orden. Código, Nombre, Precio y Unidad por Bulto.");
         }
         return true;
-    }
-
-    // Función que agrega un producto
-    public static void addProduct(Row row, Map<String, String> productos) throws Exception {
-        final double codigoValue = Double.parseDouble(getCellValue(row.getCell(0)));
-        final String codigo = (codigoValue % 1 == 0) ? String.format("%.0f", codigoValue) : String.valueOf(codigoValue);
-        final String producto = getCellValue(row.getCell(1));
-        productos.put(codigo, producto);
     }
 
     // Cuenta cantidad de productos en el Excel

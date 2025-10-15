@@ -1,5 +1,7 @@
 package fx;
 
+import enums.PageType;
+import enums.ProductQuantity;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -14,8 +16,6 @@ import org.apache.log4j.BasicConfigurator;
 import pdf.PDFStyleDefaults;
 import pdf.themes.KitchenToolsTheme;
 import pdf.themes.LineageTheme;
-import enums.PageType;
-import enums.ProductQuantity;
 
 import java.io.File;
 import java.net.URL;
