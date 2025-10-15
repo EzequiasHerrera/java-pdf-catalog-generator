@@ -1,5 +1,8 @@
 package utils;
 
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Div;
@@ -11,6 +14,7 @@ import com.itextpdf.layout.properties.VerticalAlignment;
 import pdf.components.CardPortadaComponent;
 import pdf.themes.Theme;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -20,7 +24,7 @@ public class PDFUtils {
 
     // Funcion que agrega primer pagina del catalogo
     public static void addFirstPage(Document doc, float pageHeight, float pageWidth, String titleTextInput,
-                                    String subtitleTextInput, Theme theme, boolean presupuestoActivo) {
+                                    String subtitleTextInput, Theme theme, boolean presupuestoActivo) throws IOException {
 
         if (titleTextInput == null || titleTextInput.isBlank()) {
             if (presupuestoActivo) {
@@ -30,14 +34,8 @@ public class PDFUtils {
             }
         }
 
-        Paragraph titulo = new Paragraph(titleTextInput)
-                .setFontSize(50)
-                .simulateBold()
-                .setFontColor(theme.titleTextColor)
-                .setTextAlignment(TextAlignment.CENTER)
-                .setPaddingBottom(30)
-                .setPaddingTop(30)
-                .setMultipliedLeading(0.8f);
+        final PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+        final Paragraph titulo = autoFitToSingleLine(titleTextInput, theme, font, CardPortadaComponent.CARD_WIDTH - CardPortadaComponent.BORDER_WIDTH * 2, 70f, 10f);
 
         if (subtitleTextInput == null || subtitleTextInput.isBlank()) {
             final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
@@ -73,6 +71,36 @@ public class PDFUtils {
 
         // 🔁 Salto de página explícito para evitar desbordes en la página 2
         doc.add(new AreaBreak());
+    }
+
+    private static Paragraph autoFitToSingleLine(String titleTextInput, Theme theme, PdfFont font, float maxWidth, float initialSize, float minSize) {
+
+        float currentSize = initialSize;
+        float textWidth;
+
+        // Medir texto directamente con la fuente
+        while (true) {
+            textWidth = font.getWidth(titleTextInput, currentSize);
+
+            if (textWidth > maxWidth && currentSize > minSize) {
+                currentSize -= 0.5f;
+            } else {
+                break;
+            }
+        }
+
+        // Crear párrafo final con el tamaño adecuado
+        Paragraph paragraph = new Paragraph(titleTextInput)
+                .setFont(font)
+                .setFontSize(currentSize)
+                .setFontColor(theme.titleTextColor)
+//                .simulateBold()
+                .setTextAlignment(TextAlignment.CENTER)
+                .setPaddingTop(30)
+                .setPaddingBottom(30)
+                .setMultipliedLeading(0.8f);
+
+        return paragraph;
     }
 
     public static String formatPrice(String rawPrice) {

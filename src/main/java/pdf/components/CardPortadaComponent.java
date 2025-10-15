@@ -11,10 +11,14 @@ import com.itextpdf.layout.properties.BorderRadius;
 import com.itextpdf.layout.properties.HorizontalAlignment;
 
 public class CardPortadaComponent {
+
+    public final static float CARD_WIDTH = 350f;
+    public final static float BORDER_WIDTH = 2f;
+
     public static Div build(Paragraph titulo, Paragraph subtitulo, boolean presupuestoActivo) {
 
-        Div separator = new Div()
-                .setWidth(350)
+        final Div separator = new Div()
+                .setWidth(CARD_WIDTH)
                 .setHeight(1)
                 .setBackgroundColor(ColorConstants.LIGHT_GRAY);
 
@@ -27,10 +31,10 @@ public class CardPortadaComponent {
 
         return new Div()
                 // .setHeight(100)
-                .setWidth(350)
+                .setWidth(CARD_WIDTH)
                 .setBackgroundColor(WHITE_COLOR)
                 .setBorderRadius(new BorderRadius(15f))
-                .setBorder(new SolidBorder(ColorConstants.LIGHT_GRAY, 2))
+                .setBorder(new SolidBorder(ColorConstants.LIGHT_GRAY, BORDER_WIDTH))
                 .setHorizontalAlignment(HorizontalAlignment.CENTER)
                 .add(new Paragraph(textoSuperior)
                         .simulateBold()
@@ -43,4 +47,5 @@ public class CardPortadaComponent {
                 .add(separator)
                 .add(subtitulo);
     }
+
 }
