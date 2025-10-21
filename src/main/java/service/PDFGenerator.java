@@ -49,15 +49,14 @@ public class PDFGenerator {
             boolean imagenes,
 
             TextArea logTextArea,
-            int productoQuantity,
+            int productsPerPage, // CANTIDAD DE PRODUCTOS QUE QUIERO POR PAGINA
             String titleTextInput,
             String subtitleTextInput,
             String selectedTheme,
             boolean presupuestoActivo) throws Exception {
 
-        int totalProducts = 0;
-        final int productsPerPage = productoQuantity; // CANTIDAD DE PRODUCTOS QUE QUIERO POR PAGINA
         final StringBuilder log = new StringBuilder();
+        int totalProducts = 0;
 
         try ( // EXCEL ----------------------------------------------
               final OPCPackage pkg = OPCPackage.open(archivoExcel, PackageAccess.READ);
@@ -161,7 +160,11 @@ public class PDFGenerator {
                 logTextArea.appendText(log.toString());
             });
         }
-        return totalProducts - 1; // Resto 1 para no contar la fila de encabezados
+        if (totalProducts > 1) {
+            return totalProducts - 1; // Resto 1 para no contar la fila de encabezados
+        } else {
+            return 0;
+        }
     }
 
 }

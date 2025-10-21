@@ -73,17 +73,18 @@ public class PDFUtils {
         doc.add(new AreaBreak());
     }
 
-    private static Paragraph autoFitToSingleLine(String titleTextInput, Theme theme, PdfFont font, float maxWidth, float initialSize, float minSize) {
+    // Devuelve el tamaño del Paragraph ajustado
+    private static Paragraph autoFitToSingleLine(String titleTextInput, Theme theme, PdfFont font, float maxWidth, float initialFontSize, float minFontSize) {
 
-        float currentSize = initialSize;
+        float currentFontSize = initialFontSize;
         float textWidth;
 
         // Medir texto directamente con la fuente
         while (true) {
-            textWidth = font.getWidth(titleTextInput, currentSize);
+            textWidth = font.getWidth(titleTextInput, currentFontSize);
 
-            if (textWidth > maxWidth && currentSize > minSize) {
-                currentSize -= 0.5f;
+            if (textWidth > maxWidth && currentFontSize > minFontSize) {
+                currentFontSize -= 0.5f;
             } else {
                 break;
             }
@@ -92,7 +93,7 @@ public class PDFUtils {
         // Crear párrafo final con el tamaño adecuado
         Paragraph paragraph = new Paragraph(titleTextInput)
                 .setFont(font)
-                .setFontSize(currentSize)
+                .setFontSize(currentFontSize)
                 .setFontColor(theme.titleTextColor)
 //                .simulateBold()
                 .setTextAlignment(TextAlignment.CENTER)
