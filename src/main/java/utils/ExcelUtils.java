@@ -1,8 +1,6 @@
 package utils;
 
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 
 public class ExcelUtils {
 
@@ -25,7 +23,7 @@ public class ExcelUtils {
     }
 
     // Función que devuelve el valor de una celda
-    public static String getCellValue(org.apache.poi.ss.usermodel.Cell cell) throws Exception {
+    public static String getCellValue(Cell cell) throws Exception {
         if (cell == null) {
             return "";
         }
@@ -77,7 +75,7 @@ public class ExcelUtils {
     }
 
     // Cuenta cantidad de productos en el Excel
-    public static int countRowsInFile(org.apache.poi.ss.usermodel.Sheet sheet, StringBuilder log) {
+    public static int countRowsInFile(Sheet sheet) {
         int rowCount = 0;
         for (Row row : sheet) {
             if (row != null && !ExcelUtils.isEmptyRow(row)) {

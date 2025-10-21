@@ -66,7 +66,7 @@ public class PDFGenerator {
             final Row firstRow = sheet.getRow(0);
 
             if (ExcelUtils.isValidExcel(firstRow)) {
-                totalProducts = ExcelUtils.countRowsInFile(sheet, log);
+                totalProducts = ExcelUtils.countRowsInFile(sheet);
                 // EXCEL ----------------------------------------------
 
                 try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
@@ -139,8 +139,6 @@ public class PDFGenerator {
 
                         // 📄 Agrego tabla con hasta 12 productos
                         doc.add(table);
-//                    PDFUtils.addPageNumber(pdfDoc, font, fontSize, logoData, y); // Cambiado por FooterHandler
-
                         // ↪️ Si quedan productos, salto de página
                         if (actualProductIndex <= totalProducts) {
                             doc.add(new AreaBreak());
@@ -154,7 +152,9 @@ public class PDFGenerator {
             throw e;
         }
 
-        if (logTextArea != null && !log.isEmpty()) {
+        if (!log.isEmpty() && logTextArea == null) { // Imprime por consola
+            System.out.println(log);
+        } else if (!log.isEmpty()) { // Imprime por JavaFx
             Platform.runLater(() -> {
                 logTextArea.setStyle("-fx-text-fill: #d3d700;");
                 logTextArea.appendText(log.toString());

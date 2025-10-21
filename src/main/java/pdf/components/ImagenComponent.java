@@ -30,66 +30,87 @@ public class ImagenComponent {
         }
     }
 
-    public static Image build(Cell codigoCell, File carpetaImagenes, float imageSize) throws Exception {
-        String codigoValue = PDFUtils.safeText(ExcelUtils.getCellValue(codigoCell), "[SIN CÓDIGO]");
-        String cleanCode = codigoValue.replace(",", ".");
-        double codigoNum = Double.parseDouble(cleanCode);
-        String codigoImagen = (codigoNum % 1 == 0) ? String.format("%.0f", codigoNum) : String.valueOf(codigoNum);
+    public static Image build(Cell codigoCell, File carpetaImagenes, float imageSize, StringBuilder log) throws Exception {
 
-        for (String ext : EXTENSIONS) {
-            Path path = Paths.get(carpetaImagenes.toString(), codigoImagen + ext);
-            if (Files.isRegularFile(path)) {
-                BufferedImage original = ImageIO.read(path.toFile());
-                if (original == null) continue;
+        final String codigoValue = PDFUtils.safeText(ExcelUtils.getCellValue(codigoCell), "[SIN CÓDIGO]");
+        final String cleanCode = codigoValue.replace(",", ".");
 
-                final int width = original.getWidth();
-                final int height = original.getHeight();
-                final int threshold = 240;
+        if (esNumero(cleanCode)) {
+            double codigoNum = Double.parseDouble(cleanCode);
+            String codigoImagen = (codigoNum % 1 == 0) ? String.format("%.0f", codigoNum) : String.valueOf(codigoNum);
+            boolean existe = false;
 
-                // ⚡ Obtenemos todos los píxeles de una sola vez (mucho más rápido)
-                int[] pixels = original.getRGB(0, 0, width, height, null, 0, width);
+            for (String ext : EXTENSIONS) {
+                Path path = Paths.get(carpetaImagenes.toString(), codigoImagen + ext);
+                if (Files.isRegularFile(path)) {
+                    existe = true;
+                    BufferedImage original = ImageIO.read(path.toFile());
+                    if (original == null) continue;
 
-                int left = width, right = -1, top = height, bottom = -1;
+                    final int width = original.getWidth();
+                    final int height = original.getHeight();
+                    final int threshold = 240;
 
-                // 🚀 Un solo bucle lineal sobre todos los píxeles
-                for (int y = 0, idx = 0; y < height; y++) {
-                    for (int x = 0; x < width; x++, idx++) {
-                        int rgb = pixels[idx];
-                        int r = (rgb >> 16) & 0xff;
-                        int g = (rgb >> 8) & 0xff;
-                        int b = rgb & 0xff;
+                    // ⚡ Obtenemos todos los píxeles de una sola vez (mucho más rápido)
+                    int[] pixels = original.getRGB(0, 0, width, height, null, 0, width);
 
-                        if (r < threshold || g < threshold || b < threshold) {
-                            if (x < left) left = x;
-                            if (x > right) right = x;
-                            if (y < top) top = y;
-                            if (y > bottom) bottom = y;
+                    int left = width, right = -1, top = height, bottom = -1;
+
+                    // 🚀 Un solo bucle lineal sobre todos los píxeles
+                    for (int y = 0, idx = 0; y < height; y++) {
+                        for (int x = 0; x < width; x++, idx++) {
+                            int rgb = pixels[idx];
+                            int r = (rgb >> 16) & 0xff;
+                            int g = (rgb >> 8) & 0xff;
+                            int b = rgb & 0xff;
+
+                            if (r < threshold || g < threshold || b < threshold) {
+                                if (x < left) left = x;
+                                if (x > right) right = x;
+                                if (y < top) top = y;
+                                if (y > bottom) bottom = y;
+                            }
+                        }
+                    }
+
+                    if (right > left && bottom > top) {
+                        int marginVertical = 50;
+                        top = Math.max(0, top - marginVertical);
+                        bottom = Math.min(height - 1, bottom + marginVertical);
+
+                        BufferedImage cropped = original.getSubimage(left, top, right - left + 1, bottom - top + 1);
+
+                        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                            ImageIO.write(cropped, "png", baos);
+                            return new Image(ImageDataFactory.create(baos.toByteArray()))
+                                    .scaleToFit(imageSize, imageSize)
+                                    .setAutoScale(false)
+                                    .setHorizontalAlignment(HorizontalAlignment.CENTER);
                         }
                     }
                 }
-
-                if (right > left && bottom > top) {
-                    int marginVertical = 50;
-                    top = Math.max(0, top - marginVertical);
-                    bottom = Math.min(height - 1, bottom + marginVertical);
-
-                    BufferedImage cropped = original.getSubimage(left, top, right - left + 1, bottom - top + 1);
-
-                    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                        ImageIO.write(cropped, "png", baos);
-                        return new Image(ImageDataFactory.create(baos.toByteArray()))
-                                .scaleToFit(imageSize, imageSize)
-                                .setAutoScale(false)
-                                .setHorizontalAlignment(HorizontalAlignment.CENTER);
-                    }
-                }
             }
+            if (!existe) {
+                log.append("No existe la imagen para el producto: ").append(codigoImagen).append('\n');
+            }
+        } else {
+            log.append("El código del producto no es un número: ").append(cleanCode).append('\n');
         }
 
         return new Image(sinImagen)
                 .scaleToFit(imageSize, imageSize)
                 .setAutoScale(false)
                 .setHorizontalAlignment(HorizontalAlignment.CENTER);
+    }
+
+    public static boolean esNumero(String str) {
+        if (str == null || str.trim().isEmpty()) return false;
+        try {
+            Double.parseDouble(str.trim());
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     // version de Ezequias

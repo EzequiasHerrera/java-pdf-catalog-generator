@@ -4,6 +4,8 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
+import enums.PageType;
+import enums.ProductQuantity;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -13,8 +15,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import service.PDFGenerator;
 import utils.ExcelUtils;
-import enums.PageType;
-import enums.ProductQuantity;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,7 +114,7 @@ public class CommandLine {
                 if (validarUbicaciones()) {
                     // HOJA PARAMETROS
                     final Sheet parametrosSheet = workbook.getSheetAt(0); // 1° hoja
-                    final int parametrosRows = ExcelUtils.countRowsInFile(parametrosSheet, new StringBuilder());
+                    final int parametrosRows = ExcelUtils.countRowsInFile(parametrosSheet);
 
                     for (int r = 1; r <= parametrosRows; r++) { // Empiezo en la fila 2
                         row = parametrosSheet.getRow(r);
@@ -313,7 +313,7 @@ public class CommandLine {
             try (final OPCPackage pkg = OPCPackage.open(archivoOrigenExcel, PackageAccess.READ);
                  final XSSFWorkbook workbook = new XSSFWorkbook(pkg)) {
                 final Sheet sheet = workbook.getSheetAt(0); // 1° hoja
-                final int rows = ExcelUtils.countRowsInFile(sheet, new StringBuilder());
+                final int rows = ExcelUtils.countRowsInFile(sheet);
                 if (rows < 2) {
                     return false;
                 }

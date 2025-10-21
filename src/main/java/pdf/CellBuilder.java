@@ -43,7 +43,7 @@ public class CellBuilder {
         Paragraph uxb = UxBComponent.build(row.getCell(3), theme);
 
         // 🖼️ IMAGEN
-        Image image = ImagenComponent.build(row.getCell(0), carpetaImagenes, imageSize);
+        Image image = ImagenComponent.build(row.getCell(0), carpetaImagenes, imageSize, log);
 
         // 🧱 ARMADO FINAL
         if (productsPerPage <= 4) {
