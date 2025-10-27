@@ -15,11 +15,23 @@ import utils.PDFUtils;
 public class UxBComponent {
     public static Paragraph build(Cell cell, Theme theme) {
         try {
-            String uxbText = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "--");
+            String rawText = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "--");
+
+            String uxbText;
+            try {
+                double value = Double.parseDouble(rawText);
+                if (value == (int) value) { // es entero
+                    uxbText = String.valueOf((int) value);
+                } else { // tiene decimales
+                    uxbText = String.valueOf(value);
+                }
+            } catch (NumberFormatException e) {
+                uxbText = rawText; // mantiene "--" o cualquier valor no numérico
+            }
 
             Text valorUxb = new Text(uxbText).simulateBold();
 
-            return new Paragraph("UXB: ")
+            return new Paragraph("UxB: ")
                     .add(valorUxb)
                     .setFontSize(10)
                     .setFontColor(BLACK_COLOR)
@@ -28,7 +40,7 @@ public class UxBComponent {
                     .setMargin(0)
                     .setPadding(1);
         } catch (Exception e) {
-            return new Paragraph("UXB: ")
+            return new Paragraph("UxB: ")
                     .add("-")
                     .setFontSize(10)
                     .setFontColor(BLACK_COLOR)

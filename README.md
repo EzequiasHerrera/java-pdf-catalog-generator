@@ -8,3 +8,5 @@
 
 (NECESITA JACOB: https://github.com/freemansoft/jacob-project/releases/download/Root_B-1_21/jacob-1.21.zip
 Descargar e instalar con mvn en local repo. Copiar el "jacob-1.21-x64.dll" a la carpeta .jar ejecutable) 
+
+*Corregir: Esta agregando una hoja de más cuando al pdf cuando la anterior esta llena.*

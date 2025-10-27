@@ -107,11 +107,14 @@ public class PDFUtils {
     public static String formatPrice(String rawPrice) {
         try {
             double price = Double.parseDouble(rawPrice.replace(",", "."));
+            if (price == 0) {
+                return "--";
+            }
             DecimalFormatSymbols symbols = new DecimalFormatSymbols();
             symbols.setDecimalSeparator(',');
             symbols.setGroupingSeparator('.');
 
-            DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
+            DecimalFormat formatter = new DecimalFormat("$#,##0.00", symbols);
             return formatter.format(price);
         } catch (NumberFormatException e) {
             return "--";

@@ -37,7 +37,6 @@ public class GeneratePDFService extends Service<Integer> {
     // CONSTRUCTOR
     public GeneratePDFService(
             // ENVÍO COMO PARAMETRO TODAS LAS VARIABLES AL CONSTRUCTOR GeneratePDFService
-
             File archivoExcel,
             File carpetaImagenes,
             boolean caratula,

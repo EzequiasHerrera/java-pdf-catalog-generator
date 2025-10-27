@@ -69,7 +69,7 @@ public class ExcelUtils {
     // Verifica si el Excel contiene las 4 columnas CODIGO PRODUCTO PRECIO UXB
     public static boolean isValidExcel(Row firstRow) throws Exception {
         if (firstRow == null || firstRow.getLastCellNum() < 4) {
-            throw new Exception("Verifique que la hoja tenga los 4 encabezados en orden. Código, Nombre, Precio y Unidad por Bulto.");
+            throw new Exception("Verifique que la hoja tenga los 4 encabezados en orden: 'Código', 'Nombre', 'Precio' y 'Unidad por Bulto'.");
         }
         return true;
     }
