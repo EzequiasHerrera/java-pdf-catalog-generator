@@ -142,6 +142,7 @@ public class VentanaController implements Initializable {
             String imageSize = switch (newVal) {
                 case 2 -> "380";
                 case 4 -> "190";
+                case 8 -> "100";
                 case 12 -> "90";
                 case 20 -> "60";
                 default -> "";
@@ -158,7 +159,7 @@ public class VentanaController implements Initializable {
 
         // Populate the ChoiceBox with font families
         sheetSizeComboBox.getItems().addAll("A4", "A3", "Carta");
-        productoQuantityComboBox.getItems().addAll(2, 4, 12, 20);
+        productoQuantityComboBox.getItems().addAll(2, 4, 8, 12, 20);
 
         errorSound = new AudioClip(getClass().getResource("/audios/error.mp3").toExternalForm());
         successSound = new AudioClip(getClass().getResource("/audios/success.mp3").toExternalForm());
