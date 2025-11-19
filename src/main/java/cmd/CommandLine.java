@@ -33,6 +33,7 @@ import java.util.List;
 // Clase principal cuando se ejecuta desde línea de comandos
 public class CommandLine {
 
+    private static final Path JACOB_DLL = Paths.get(System.getenv("PROGRAMDATA"), "SuperMaster", "libs", "jacob-1.21-x64.dll");
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
 
     private File carpetaImagenes; // Directorio donde encontrar las imagenes
@@ -176,11 +177,10 @@ public class CommandLine {
     // Filtrar, ordenar y exportar usando las macros de Excel (JACOB)
     public void filtrarOrdenarExportar(List<HashMap<String, Object>> parametros) throws URISyntaxException {
         // DLL de JACOB
-        final Path dllPath = Paths.get(getJarFolder(), "jacob-1.21-x64.dll");
-        if (!Files.exists(dllPath)) {
-            throw new RuntimeException("No se encontró el archivo DLL en: " + dllPath);
+        if (!Files.exists(JACOB_DLL)) {
+            throw new RuntimeException("No se encontró el archivo DLL en: " + JACOB_DLL);
         }
-        System.setProperty("jacob.dll.path", dllPath.toAbsolutePath().toString());
+        System.setProperty("jacob.dll.path", JACOB_DLL.toAbsolutePath().toString());
 
         ActiveXComponent xl = null;
         try {
