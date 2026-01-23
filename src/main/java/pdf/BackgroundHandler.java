@@ -25,19 +25,23 @@ public class BackgroundHandler extends AbstractPdfDocumentEventHandler {
 
     @Override
     protected void onAcceptedEvent(AbstractPdfDocumentEvent event) { // MODIFICADO PARA LA NUEVA VERSION
-        PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
-        PdfPage page = docEvent.getPage();
-        int pageNumber = pdfDoc.getPageNumber(page);
-        Rectangle pageSize = page.getPageSize();
+        try {
+            PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
+            PdfPage page = docEvent.getPage();
+            int pageNumber = pdfDoc.getPageNumber(page);
+            Rectangle pageSize = page.getPageSize();
 
-        PdfCanvas canvas = new PdfCanvas(
-                page.newContentStreamBefore(),
-                page.getResources(),
-                pdfDoc);
+            PdfCanvas canvas = new PdfCanvas(
+                    page.newContentStreamBefore(),
+                    page.getResources(),
+                    pdfDoc);
 
-        // Elegimos la imagen según el número de página
-        ImageData fondo = (caratula && pageNumber == 1) ? backgroundFirstPageImg : backgroundImg;
-        canvas.addImageFittedIntoRectangle(fondo, pageSize, false);
+            // Elegimos la imagen según el número de página
+            ImageData fondo = (caratula && pageNumber == 1) ? backgroundFirstPageImg : backgroundImg;
+            canvas.addImageFittedIntoRectangle(fondo, pageSize, false);
+        } catch (Exception e) {
+            System.err.println("Error al agregar fondo a la página: " + e.getMessage());
+        }
     }
 
 }

@@ -296,18 +296,6 @@ public class CommandLine {
         System.out.println(dtf.format(LocalDateTime.now()) + ": Proceso finalizado.");
     }
 
-    private boolean isNumeric(String strNum) {
-        if (strNum == null) {
-            return false;
-        }
-        try {
-            Float.parseFloat(strNum);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
-    }
-
     private boolean validarArchivoOrigenExcel(File archivoOrigenExcel) throws InvalidFormatException, IOException {
         if (archivoOrigenExcel != null && archivoOrigenExcel.isFile()) {
             try (final OPCPackage pkg = OPCPackage.open(archivoOrigenExcel, PackageAccess.READ);
