@@ -4,22 +4,48 @@ import org.apache.poi.ss.usermodel.*;
 
 public class ExcelUtils {
 
-    // Función que detecta si una fila está vacía
+    // Función que detecta si una fila está vacía o no tiene código (primera columna)
     public static boolean isEmptyRow(Row row) {
         if (row == null) {
             return true;
         }
+        // Si no tiene código (primera columna), considerar como fila vacía
+        if (hasNoCode(row)) {
+            return true;
+        }
+        return false;
+    }
+
+    // Detecta si una fila no tiene código en la primera columna
+    public static boolean hasNoCode(Row row) {
+        if (row == null) {
+            return true;
+        }
+        final org.apache.poi.ss.usermodel.Cell codigoCell = row.getCell(0);
+        if (codigoCell == null || codigoCell.getCellType() == CellType.BLANK) {
+            return true;
+        }
+        if (codigoCell.getCellType() == CellType.STRING && codigoCell.getStringCellValue().trim().isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Detecta si una fila tiene algún dato (en cualquier columna)
+    public static boolean hasAnyData(Row row) {
+        if (row == null) {
+            return false;
+        }
         for (int i = row.getFirstCellNum(); i < row.getLastCellNum(); i++) {
             final org.apache.poi.ss.usermodel.Cell cell = row.getCell(i);
             if (cell != null && cell.getCellType() != CellType.BLANK) {
-                // Si es string, comprobar que no sea solo espacios
                 if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty()) {
-                    continue; // sigue buscando
+                    continue;
                 }
-                return false; // hay contenido real
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     // Función que devuelve el valor de una celda

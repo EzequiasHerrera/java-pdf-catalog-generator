@@ -67,6 +67,9 @@ public class PDFGenerator {
 
             if (ExcelUtils.isValidExcel(firstRow)) {
                 totalProducts = ExcelUtils.countRowsInFile(sheet);
+                if (totalProducts < 2) {
+                    throw new Exception("El archivo Excel no contiene productos. Debe tener al menos 1 producto además de los encabezados.");
+                }
                 // EXCEL ----------------------------------------------
 
                 try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
@@ -109,6 +112,10 @@ public class PDFGenerator {
 
                             final Row row = sheet.getRow(actualProductIndex);
                             if (ExcelUtils.isEmptyRow(row)) {
+                                // Informar si la fila tiene datos pero no tiene código
+                                if (ExcelUtils.hasAnyData(row) && ExcelUtils.hasNoCode(row)) {
+                                    log.append("Fila ").append(actualProductIndex + 1).append(" ignorada: no tiene código.\n");
+                                }
                                 actualProductIndex++;
                                 continue;
                             }
