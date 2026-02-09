@@ -17,7 +17,12 @@ public class CardPortadaComponent {
 
     public static Div build(Paragraph titulo, Paragraph subtitulo, boolean presupuestoActivo) {
 
-        final Div separator = new Div()
+        final Div separator1 = new Div()
+                .setWidth(CARD_WIDTH)
+                .setHeight(1)
+                .setBackgroundColor(ColorConstants.LIGHT_GRAY);
+
+        final Div separator2 = new Div()
                 .setWidth(CARD_WIDTH)
                 .setHeight(1)
                 .setBackgroundColor(ColorConstants.LIGHT_GRAY);
@@ -42,9 +47,9 @@ public class CardPortadaComponent {
                         .setFontSize(23)
                         .setCharacterSpacing(1)
                         .setFontColor(GRAY_COLOR))
-                .add(separator)
+                .add(separator1)
                 .add(titulo)
-                .add(separator)
+                .add(separator2)
                 .add(subtitulo);
     }
 

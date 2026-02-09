@@ -13,6 +13,8 @@ import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import pdf.PDFStyleDefaults;
+import service.PDFGenerationStats;
 import service.PDFGenerator;
 import utils.ExcelUtils;
 
@@ -115,9 +117,9 @@ public class CommandLine {
                 if (validarUbicaciones()) {
                     // HOJA PARAMETROS
                     final Sheet parametrosSheet = workbook.getSheetAt(0); // 1° hoja
-                    final int parametrosRows = ExcelUtils.countRowsInFile(parametrosSheet);
+                    final int lastRowIndex = parametrosSheet.getLastRowNum();
 
-                    for (int r = 1; r <= parametrosRows; r++) { // Empiezo en la fila 2
+                    for (int r = 1; r <= lastRowIndex; r++) { // Empiezo en la fila 2
                         row = parametrosSheet.getRow(r);
                         if (ExcelUtils.isEmptyRow(row)) {
                             continue;
@@ -274,16 +276,24 @@ public class CommandLine {
             if (validarCarpetaDestino(carpetaDestinoFile)) {
                 final File archivoDestinoPdf = new File(carpetaDestinoFile.getAbsolutePath() + File.separator + (clasificacion.isBlank() ? "" : clasificacion + " - ") + mixProductos + ".pdf");
                 if (validarArchivoOrigenExcel(archivoOrigenExcel)) {
-                    final int productos = PDFGenerator.generarPDF(archivoOrigenExcel, carpetaImagenes, caratula, archivoDestinoPdf,
+                    final PDFGenerationStats stats = PDFGenerator.generarPDF(archivoOrigenExcel, carpetaImagenes, caratula, archivoDestinoPdf,
                             imageSize,
                             pageType,
                             codigoCheckBox, productoCheckBox, precioCheckBox,
                             unidadPorBultoCheckBox, imagenCheckBox, null,
                             productoQuantity, title, subtitle,
-                            selectedTheme, presupuesto);
+                            selectedTheme, presupuesto,
+                            PDFStyleDefaults.FONT_SIZE_CODIGO,
+                            PDFStyleDefaults.FONT_SIZE_PRODUCTO,
+                            PDFStyleDefaults.FONT_SIZE_PRECIO,
+                            PDFStyleDefaults.FONT_SIZE_UXB,
+                            PDFStyleDefaults.WHITE_COLOR,
+                            PDFStyleDefaults.BLACK_COLOR,
+                            PDFStyleDefaults.BLACK_COLOR,
+                            PDFStyleDefaults.BLACK_COLOR);
                     System.out.println("------------------------------------------------------------------------------------------------------------------");
                     System.out.println(dtf.format(LocalDateTime.now()) + ": Generando catálogo: " + archivoDestinoPdf.getName() + "...");
-                    System.out.println(dtf.format(LocalDateTime.now()) + ": " + productos + " productos han sido generados.");
+                    System.out.println(dtf.format(LocalDateTime.now()) + ": " + stats.productosGenerados + " productos han sido generados.");
                     System.out.println(dtf.format(LocalDateTime.now()) + ": \"" + archivoDestinoPdf.getAbsolutePath() + "\" generado.");
                 } else {
                     System.out.println(dtf.format(LocalDateTime.now()) + ": El archivo Excel de origen no existe o está vacío para: " + listaPrecios + " - " + mixProductos + (clasificacion.isBlank() ? "" : " - " + clasificacion));

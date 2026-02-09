@@ -7,13 +7,19 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.log4j.BasicConfigurator;
+import com.itextpdf.kernel.colors.DeviceRgb;
 import pdf.PDFStyleDefaults;
+import service.PDFGenerationStats;
 import pdf.themes.KitchenToolsTheme;
 import pdf.themes.LineageTheme;
 import utils.ValidationUtils;
@@ -86,15 +92,23 @@ public class VentanaController implements Initializable {
     @FXML
     private CheckBox caratulaCheckBox;
 
+    // BUSCAR
+    @FXML
+    private Button buscarExcelButton;
+    @FXML
+    private Button buscarImagenesButton;
+
     // THEMES
     @FXML
     private Button lineageButton;
     @FXML
     private Button kitchenButton;
 
-    // Crea un area donde escribir texto
+    // Log con texto coloreado
     @FXML
-    private TextArea logTextArea;
+    private ScrollPane logScrollPane;
+    @FXML
+    private TextFlow logTextFlow;
     // Crea un botón
     @FXML
     private Button generarButton;
@@ -160,6 +174,26 @@ public class VentanaController implements Initializable {
                 throw new RuntimeException(e);
             }
         });
+
+        // Menú contextual para copiar el log
+        ContextMenu logContextMenu = new ContextMenu();
+        MenuItem copyItem = new MenuItem("Copiar todo");
+        copyItem.setOnAction(e -> {
+            StringBuilder sb = new StringBuilder();
+            for (var node : logTextFlow.getChildren()) {
+                if (node instanceof Text) {
+                    sb.append(((Text) node).getText());
+                }
+            }
+            ClipboardContent content = new ClipboardContent();
+            content.putString(sb.toString());
+            Clipboard.getSystemClipboard().setContent(content);
+        });
+        logContextMenu.getItems().add(copyItem);
+        logTextFlow.setOnContextMenuRequested(e -> logContextMenu.show(logTextFlow, e.getScreenX(), e.getScreenY()));
+
+        // Auto-scroll al agregar texto
+        logTextFlow.heightProperty().addListener((obs, oldVal, newVal) -> logScrollPane.setVvalue(1.0));
 
         loadPreferences(); // Load previous state from preferences
     }
@@ -235,11 +269,19 @@ public class VentanaController implements Initializable {
     }
 
     private void loadColorPreference(String key, String defaultValue, ColorPicker colorPicker) {
-        final String[] rgb = prefs.get(key, defaultValue).split(",");
-        colorPicker.setValue(new Color(
-                Double.parseDouble(rgb[0]),
-                Double.parseDouble(rgb[1]),
-                Double.parseDouble(rgb[2]), 1));
+        try {
+            final String[] rgb = prefs.get(key, defaultValue).split(",");
+            colorPicker.setValue(new Color(
+                    Double.parseDouble(rgb[0]),
+                    Double.parseDouble(rgb[1]),
+                    Double.parseDouble(rgb[2]), 1));
+        } catch (Exception e) {
+            final String[] rgb = defaultValue.split(",");
+            colorPicker.setValue(new Color(
+                    Double.parseDouble(rgb[0]),
+                    Double.parseDouble(rgb[1]),
+                    Double.parseDouble(rgb[2]), 1));
+        }
     }
 
     private void loadCheckBoxState(String key, CheckBox checkBox, TextField fontSize, ColorPicker colorPicker) {
@@ -279,6 +321,10 @@ public class VentanaController implements Initializable {
         prefs.putBoolean("imagenCheckBox", imagenCheckBox.isSelected());
     }
 
+    private DeviceRgb toITextColor(Color fxColor) {
+        return new DeviceRgb((float) fxColor.getRed(), (float) fxColor.getGreen(), (float) fxColor.getBlue());
+    }
+
     private void saveColorPreference(String key, ColorPicker colorPicker) {
         Color color = colorPicker.getValue();
         prefs.put(key, color.getRed() + "," + color.getGreen() + "," + color.getBlue());
@@ -303,7 +349,7 @@ public class VentanaController implements Initializable {
 
     @FXML
     public void buscarExcel(ActionEvent event) {
-        logTextArea.clear();
+        clearLog();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Elige archivo .xlsx");
@@ -311,12 +357,13 @@ public class VentanaController implements Initializable {
                 new FileChooser.ExtensionFilter("Archivo XLSX", "*.xlsx"));
 
         // Busco la ultima ruta guardada en el sistema
-        final File lastPath = new File(prefs.get("ubicacionExcel", ""));
+        final File lastFile = new File(prefs.get("ubicacionExcel", ""));
+        final File lastDir = lastFile.getParentFile();
 
-        if (!lastPath.isDirectory()) {
-            fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        if (lastDir != null && lastDir.isDirectory()) {
+            fileChooser.setInitialDirectory(lastDir);
         } else {
-            fileChooser.setInitialDirectory(lastPath);
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         }
 
         archivoExcel = fileChooser.showOpenDialog(Main.stage);
@@ -325,14 +372,12 @@ public class VentanaController implements Initializable {
             ubicacionExcel.setText(archivoExcel.getAbsolutePath());
             // ✅ Guardo la ruta seleccionada
             prefs.put("ubicacionExcel", archivoExcel.getAbsolutePath());
-        } else {
-            ubicacionExcel.clear();
         }
     }
 
     @FXML
     public void buscarImagenes(ActionEvent event) {
-        logTextArea.clear();
+        clearLog();
 
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Selecciona la carpeta donde están las imágenes");
@@ -350,37 +395,34 @@ public class VentanaController implements Initializable {
             ubicacionImagenes.setText(carpetaImagenes.getAbsolutePath());
             // ✅ Guardo la ruta seleccionada
             prefs.put("ubicacionImagenes", carpetaImagenes.getAbsolutePath());
-        } else {
-            ubicacionImagenes.clear();
         }
     }
 
     @FXML
     public void generarCatalogo(ActionEvent event) {
-        logTextArea.clear();
-        logTextArea.setStyle("-fx-text-fill: firebrick;");
+        clearLog();
 
         // Validar ubicaciones
         if (archivoExcel == null || !archivoExcel.isFile()) {
-            logTextArea.appendText("Error: No se seleccionó un archivo Excel válido.\n");
+            appendLog("Error: No se seleccionó un archivo Excel válido.\n", Color.TOMATO);
             return;
         }
         if (carpetaImagenes == null || !carpetaImagenes.isDirectory()) {
-            logTextArea.appendText("Error: No se seleccionó una carpeta de imágenes válida.\n");
+            appendLog("Error: No se seleccionó una carpeta de imágenes válida.\n", Color.TOMATO);
             return;
         }
 
         // Validar que haya al menos 1 columna activa
         if (!codigoCheckBox.isSelected() && !productoCheckBox.isSelected()
                 && !precioCheckBox.isSelected() && !unidadPorBultoCheckBox.isSelected()) {
-            logTextArea.appendText("Error: Debe seleccionar al menos una columna (Código, Producto, Precio o UxB).\n");
+            appendLog("Error: Debe seleccionar al menos una columna (Código, Producto, Precio o UxB).\n", Color.TOMATO);
             return;
         }
 
         // Validar inputs numéricos
         String errorValidacion = validarTextInputs();
         if (errorValidacion != null) {
-            logTextArea.appendText("Error: " + errorValidacion + "\n");
+            appendLog("Error: " + errorValidacion + "\n", Color.TOMATO);
             return;
         }
 
@@ -394,36 +436,39 @@ public class VentanaController implements Initializable {
                 Float.parseFloat(imageSizeTextInput.getText()),
                 PageType.valueOf(pageTypeComboBox.getValue()),
                 codigoCheckBox.isSelected(), productoCheckBox.isSelected(), precioCheckBox.isSelected(),
-                unidadPorBultoCheckBox.isSelected(), imagenCheckBox.isSelected(), logTextArea,
+                unidadPorBultoCheckBox.isSelected(), imagenCheckBox.isSelected(), logTextFlow,
                 productoQuantityComboBox.getValue(), titleTextInput.getText(), subtitleTextInput.getText(),
-                selectedTheme, presupuestoCheckBox.isSelected());
+                selectedTheme, presupuestoCheckBox.isSelected(),
+                Float.parseFloat(codigoFontSize.getText()),
+                Float.parseFloat(productoFontSize.getText()),
+                Float.parseFloat(precioFontSize.getText()),
+                Float.parseFloat(unidadPorBultoFontSize.getText()),
+                toITextColor(codigoColorPicker.getValue()),
+                toITextColor(productoColorPicker.getValue()),
+                toITextColor(precioColorPicker.getValue()),
+                toITextColor(unidadPorBultoColorPicker.getValue()));
 
         service.setOnRunning(e -> {
-            generarButton.setDisable(true);
+            setControlsDisable(true);
             progressIndicator.setVisible(true);
-            logTextArea.setStyle("-fx-text-fill: darkblue;");
-            logTextArea
-                    .appendText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss"))
-                            + ": Generando PDF...\n");
+            appendLog(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss"))
+                    + ": Generando PDF...\n", Color.DODGERBLUE);
         });
         service.setOnSucceeded(e -> {
             successSound.play();
-            logTextArea.setStyle("-fx-text-fill: darkgreen;");
-            logTextArea.appendText(service.getValue() + " productos han sido generados.\n");
-            logTextArea
-                    .appendText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss"))
-                            + ": \"" + archivoDestino.getAbsolutePath() + "\" generado.\n");
-            generarButton.setDisable(false);
+            PDFGenerationStats stats = service.getValue();
+            appendLog(stats.productosGenerados + " productos han sido generados.\n", Color.LIMEGREEN);
+            appendLog(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss"))
+                    + ": \"" + archivoDestino.getAbsolutePath() + "\" generado.\n", Color.LIMEGREEN);
+            setControlsDisable(false);
             progressIndicator.setVisible(false);
         });
         service.setOnFailed(e -> {
             service.getException().printStackTrace();
             errorSound.play();
-            logTextArea.setStyle("-fx-text-fill: firebrick;");
-            logTextArea
-                    .appendText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss"))
-                            + ": Error: " + service.getException().getLocalizedMessage() + "\n");
-            generarButton.setDisable(false);
+            appendLog(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss"))
+                    + ": Error: " + service.getException().getLocalizedMessage() + "\n", Color.TOMATO);
+            setControlsDisable(false);
             progressIndicator.setVisible(false);
         });
         service.start();
@@ -488,6 +533,71 @@ public class VentanaController implements Initializable {
     @FXML
     public void onUnidadPorBultoColorChange(Event event) {
         unidadPorBultoCheckBox.setTextFill(Paint.valueOf((unidadPorBultoColorPicker.getValue().toString())));
+    }
+
+    // ---------------------LOG-------------------------------//
+
+    private void clearLog() {
+        logTextFlow.getChildren().clear();
+    }
+
+    private void appendLog(String message, Color color) {
+        Text text = new Text(message);
+        text.setFill(color);
+        logTextFlow.getChildren().add(text);
+    }
+
+    // ---------------------BLOQUEO DE CONTROLES-------------------------------//
+
+    private void setControlsDisable(boolean disable) {
+        // Botones
+        generarButton.setDisable(disable);
+        lineageButton.setDisable(disable);
+        kitchenButton.setDisable(disable);
+        buscarExcelButton.setDisable(disable);
+        buscarImagenesButton.setDisable(disable);
+
+        // ComboBoxes
+        pageTypeComboBox.setDisable(disable);
+        productoQuantityComboBox.setDisable(disable);
+
+        // Checkboxes
+        codigoCheckBox.setDisable(disable);
+        productoCheckBox.setDisable(disable);
+        precioCheckBox.setDisable(disable);
+        unidadPorBultoCheckBox.setDisable(disable);
+        imagenCheckBox.setDisable(disable);
+        caratulaCheckBox.setDisable(disable);
+
+        if (disable) {
+            // Deshabilitar todo
+            codigoFontSize.setDisable(true);
+            codigoColorPicker.setDisable(true);
+            productoFontSize.setDisable(true);
+            productoColorPicker.setDisable(true);
+            precioFontSize.setDisable(true);
+            precioColorPicker.setDisable(true);
+            unidadPorBultoFontSize.setDisable(true);
+            unidadPorBultoColorPicker.setDisable(true);
+            imageSizeTextInput.setDisable(true);
+            titleTextInput.setDisable(true);
+            subtitleTextInput.setDisable(true);
+            presupuestoCheckBox.setDisable(true);
+        } else {
+            // Restaurar estado según checkboxes
+            codigoFontSize.setDisable(!codigoCheckBox.isSelected());
+            codigoColorPicker.setDisable(!codigoCheckBox.isSelected());
+            productoFontSize.setDisable(!productoCheckBox.isSelected());
+            productoColorPicker.setDisable(!productoCheckBox.isSelected());
+            precioFontSize.setDisable(!precioCheckBox.isSelected());
+            precioColorPicker.setDisable(!precioCheckBox.isSelected());
+            unidadPorBultoFontSize.setDisable(!unidadPorBultoCheckBox.isSelected());
+            unidadPorBultoColorPicker.setDisable(!unidadPorBultoCheckBox.isSelected());
+            imageSizeTextInput.setDisable(!imagenCheckBox.isSelected());
+            titleTextInput.setDisable(!caratulaCheckBox.isSelected());
+            subtitleTextInput.setDisable(!caratulaCheckBox.isSelected());
+            presupuestoCheckBox.setDisable(!caratulaCheckBox.isSelected());
+        }
     }
 
     // ---------------------VALIDACIONES ETC-------------------------------//

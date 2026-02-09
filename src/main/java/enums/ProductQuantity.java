@@ -29,7 +29,7 @@ public enum ProductQuantity {
                 return pq;
             }
         }
-        throw new Exception("La cantidad de productos debe ser: " + ProductQuantity.values());
+        throw new Exception("La cantidad de productos debe ser: 2, 4, 12 o 20.");
     }
 
 }

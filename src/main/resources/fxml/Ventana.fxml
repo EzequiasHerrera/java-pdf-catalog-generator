@@ -10,8 +10,9 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.text.TextFlow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -169,7 +170,7 @@
                      </opaqueInsets>
                   </TextField>
             
-                              <Button alignment="CENTER" contentDisplay="CENTER" ellipsisString="" graphicTextGap="0.0" layoutX="5.0" layoutY="15.899999618530273" mnemonicParsing="false" onAction="#buscarExcel" opacity="0.0" prefHeight="24.0" prefWidth="210.0" textFill="#00a40b" wrapText="true">
+                              <Button fx:id="buscarExcelButton" alignment="CENTER" contentDisplay="CENTER" ellipsisString="" graphicTextGap="0.0" layoutX="5.0" layoutY="15.899999618530273" mnemonicParsing="false" onAction="#buscarExcel" opacity="0.0" prefHeight="24.0" prefWidth="210.0" textFill="#00a40b" wrapText="true">
                      <font>
                         <Font name="System Bold" size="17.0" />
                      </font>
@@ -199,7 +200,7 @@
                      </font>
                   </TextField>
             
-                              <Button layoutX="41.0" layoutY="34.0" mnemonicParsing="false" onAction="#buscarImagenes" opacity="0.0" prefHeight="24.0" prefWidth="210.0" textFill="#d9b247" wrapText="true">
+                              <Button fx:id="buscarImagenesButton" layoutX="41.0" layoutY="34.0" mnemonicParsing="false" onAction="#buscarImagenes" opacity="0.0" prefHeight="24.0" prefWidth="210.0" textFill="#d9b247" wrapText="true">
                      <font>
                         <Font name="System Bold" size="17.0" />
                      </font>
@@ -240,14 +241,11 @@
          </font>
       </Label>
 
-                        <TextArea fx:id="logTextArea" editable="false" layoutX="20.0" layoutY="109.0" prefHeight="106.0" prefWidth="435.0" style="-fx-background-radius: 20; -fx-background-color: #242831;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="109.0">
-         <font>
-            <Font name="Roboto" size="14.0" />
-         </font>
-         <rotationAxis>
-            <Point3D />
-         </rotationAxis>
-      </TextArea>
+      <ScrollPane fx:id="logScrollPane" layoutX="20.0" layoutY="109.0" prefHeight="106.0" prefWidth="435.0" style="-fx-background: #1c1f28; -fx-background-color: #1c1f28;" fitToWidth="true" hbarPolicy="NEVER" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="109.0">
+         <content>
+            <TextFlow fx:id="logTextFlow" style="-fx-background-color: #1c1f28; -fx-padding: 5; -fx-font-family: 'Roboto'; -fx-font-size: 14;" />
+         </content>
+      </ScrollPane>
       <Group layoutX="302.0" layoutY="347.0">
          <children>
             <Pane layoutX="-4.0" layoutY="5.0" prefHeight="182.0" prefWidth="155.0" style="-fx-background-color: #1c1f28; -fx-background-radius: 5;">

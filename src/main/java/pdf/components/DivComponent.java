@@ -36,7 +36,6 @@ public class DivComponent {
                     .setBorderRadius(new BorderRadius(6))
                     .setTextAlignment(TextAlignment.CENTER);
         } else if (productsPerPage == 8) {
-            System.out.println(productsPerPage);
             return new Div()
                     .setPadding(5)
                     .setPaddingTop(0)

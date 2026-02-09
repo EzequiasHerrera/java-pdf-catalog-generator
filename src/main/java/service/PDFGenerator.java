@@ -12,7 +12,11 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Table;
 import enums.PageType;
 import javafx.application.Platform;
-import javafx.scene.control.TextArea;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+
+import java.util.function.Consumer;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.ss.usermodel.Row;
@@ -32,7 +36,7 @@ import java.io.File;
 
 public class PDFGenerator {
 
-    public static int generarPDF(
+    public static PDFGenerationStats generarPDF(
             File archivoExcel,
             File carpetaImagenes,
             boolean caratula,
@@ -48,15 +52,33 @@ public class PDFGenerator {
 
             boolean imagenes,
 
-            TextArea logTextArea,
+            TextFlow logTextFlow,
             int productsPerPage, // CANTIDAD DE PRODUCTOS QUE QUIERO POR PAGINA
             String titleTextInput,
             String subtitleTextInput,
             String selectedTheme,
-            boolean presupuestoActivo) throws Exception {
+            boolean presupuestoActivo,
+            float codigoFontSize,
+            float productoFontSize,
+            float precioFontSize,
+            float uxbFontSize,
+            com.itextpdf.kernel.colors.Color codigoColor,
+            com.itextpdf.kernel.colors.Color productoColor,
+            com.itextpdf.kernel.colors.Color precioColor,
+            com.itextpdf.kernel.colors.Color uxbColor) throws Exception {
 
-        final StringBuilder log = new StringBuilder();
-        int productosGenerados = 0;
+        final Consumer<String> log;
+        if (logTextFlow == null) {
+            log = System.out::println;
+        } else {
+            log = message -> Platform.runLater(() -> {
+                Text text = new Text(message);
+                text.setFill(Color.web("#d3d700"));
+                logTextFlow.getChildren().add(text);
+            });
+        }
+
+        final PDFGenerationStats stats = new PDFGenerationStats();
 
         try (final OPCPackage pkg = OPCPackage.open(archivoExcel, PackageAccess.READ);
              final XSSFWorkbook workbook = new XSSFWorkbook(pkg)) {
@@ -65,10 +87,11 @@ public class PDFGenerator {
             final Row firstRow = sheet.getRow(0);
 
             if (ExcelUtils.isValidExcel(firstRow)) {
-                int totalRows = ExcelUtils.countRowsInFile(sheet);
-                if (totalRows < 2) {
+                int totalDataRows = ExcelUtils.countRowsInFile(sheet);
+                if (totalDataRows < 2) {
                     throw new Exception("El archivo Excel no contiene productos. Debe tener al menos 1 producto además de los encabezados.");
                 }
+                final int lastRowIndex = sheet.getLastRowNum();
 
                 try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
                      final PdfDocument pdfDoc = new PdfDocument(writer);
@@ -101,15 +124,16 @@ public class PDFGenerator {
 
                     int actualProductIndex = 1;
 
-                    while (actualProductIndex <= totalRows) {
+                    while (actualProductIndex <= lastRowIndex) {
                         final Table table = TableBuilder.createConfiguredTable(pageHeight, productsPerPage);
                         int itemsThisPage = 0;
 
-                        while (itemsThisPage < productsPerPage && actualProductIndex <= totalRows) {
+                        while (itemsThisPage < productsPerPage && actualProductIndex <= lastRowIndex) {
                             final Row row = sheet.getRow(actualProductIndex);
                             if (ExcelUtils.isEmptyRow(row)) {
                                 if (ExcelUtils.hasAnyData(row) && ExcelUtils.hasNoCode(row)) {
-                                    log.append("Fila ").append(actualProductIndex + 1).append(" ignorada: no tiene código.\n");
+                                    stats.filasIgnoradas++;
+                                    log.accept("Fila " + (actualProductIndex + 1) + " ignorada: no tiene código.\n");
                                 }
                                 actualProductIndex++;
                                 continue;
@@ -130,13 +154,16 @@ public class PDFGenerator {
                                     pageWidth,
                                     pageHeight,
                                     itemsThisPage,
-                                    log, productsPerPage, esPar, theme);
+                                    log, productsPerPage, esPar, theme,
+                                    codigoFontSize, productoFontSize, precioFontSize, uxbFontSize,
+                                    codigoColor, productoColor, precioColor, uxbColor,
+                                    stats);
 
                             table.addCell(container);
 
                             actualProductIndex++;
                             itemsThisPage++;
-                            productosGenerados++;
+                            stats.productosGenerados++;
                         }
 
                         if (itemsThisPage > 0) {
@@ -148,7 +175,7 @@ public class PDFGenerator {
                             }
 
                             doc.add(table);
-                            if (itemsThisPage == productsPerPage && actualProductIndex <= totalRows) {
+                            if (itemsThisPage == productsPerPage && actualProductIndex <= lastRowIndex) {
                                 doc.add(new AreaBreak());
                             }
                         }
@@ -157,18 +184,8 @@ public class PDFGenerator {
             }
         }
 
-        if (!log.isEmpty()) {
-            if (logTextArea == null) {
-                System.out.println(log);
-            } else {
-                Platform.runLater(() -> {
-                    logTextArea.setStyle("-fx-text-fill: #d3d700;");
-                    logTextArea.appendText(log.toString());
-                });
-            }
-        }
-
-        return productosGenerados;
+        log.accept(stats.toSummary());
+        return stats;
     }
 
 }

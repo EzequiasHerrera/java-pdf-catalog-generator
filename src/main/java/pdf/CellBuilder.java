@@ -1,5 +1,6 @@
 package pdf;
 
+import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.HorizontalAlignment;
@@ -11,6 +12,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import pdf.themes.Theme;
 
 import java.io.File;
+import java.util.function.Consumer;
+import service.PDFGenerationStats;
 
 public class CellBuilder {
 
@@ -18,44 +21,40 @@ public class CellBuilder {
                                   boolean precioColumn, boolean unidadPorBultoColumn,
                                   boolean imagenes, File carpetaImagenes, float imageSize, float pageWidth, float pageHeight,
                                   float itemsThisPage,
-                                  StringBuilder log, int productsPerPage, boolean esPar, Theme theme) throws Exception {
+                                  Consumer<String> log, int productsPerPage, boolean esPar, Theme theme,
+                                  float codigoFontSize, float productoFontSize, float precioFontSize, float uxbFontSize,
+                                  Color codigoColor, Color productoColor, Color precioColor, Color uxbColor,
+                                  PDFGenerationStats stats) throws Exception {
 
         Row row = sheet.getRow(rowNumber);
 
-        float availableWidthSpace = pageWidth - imageSize;
+        float availableWidthSpace = imagenes ? pageWidth - imageSize : pageWidth;
 
-        // ⬜ CARD CONTENEDOR
         Div card = DivComponent.build(productsPerPage, theme, availableWidthSpace);
 
-        // 🟫 LINEA DIVISORIA
-        Paragraph linea = LineComponent.build();
+        Paragraph codigo = codigoColumn ? CodigoComponent.build(row.getCell(0), theme, availableWidthSpace, codigoFontSize, codigoColor) : null;
+        Paragraph nombre = productoColumn ? NombreComponent.build(row.getCell(1), theme, productoFontSize, productoColor) : null;
+        Paragraph precio = precioColumn ? PrecioComponent.build(row.getCell(2), theme, precioFontSize, precioColor) : null;
+        Paragraph uxb = unidadPorBultoColumn ? UxBComponent.build(row.getCell(3), theme, uxbFontSize, uxbColor) : null;
+        Image image = imagenes ? ImagenComponent.build(row.getCell(0), carpetaImagenes, imageSize, log, stats) : null;
 
-        // 🟨 CÓDIGO
-        Paragraph codigo = CodigoComponent.build(row.getCell(0), theme, availableWidthSpace);
-
-        // 🟩 NOMBRE PRODUCTO
-        Paragraph nombre = NombreComponent.build(row.getCell(1), theme);
-
-        // 🟥 PRECIO
-        Paragraph precio = PrecioComponent.build(row.getCell(2), theme);
-
-        // 🟪 UXB
-        Paragraph uxb = UxBComponent.build(row.getCell(3), theme);
-
-        // 🖼️ IMAGEN
-        Image image = ImagenComponent.build(row.getCell(0), carpetaImagenes, imageSize, log);
-
-        // 🧱 ARMADO FINAL
         if (productsPerPage <= 4) {
-            card.add(codigo);
-            card.add(linea);
-            card.add(nombre);
-            card.add(linea);
-            card.add(precio);
-            card.add(linea);
-            card.add(uxb);
+            // Armar card con componentes visibles y lineas entre ellos
+            boolean hasContent = false;
+            if (codigo != null) { card.add(codigo); hasContent = true; }
+            if (nombre != null) {
+                if (hasContent) card.add(LineComponent.build());
+                card.add(nombre); hasContent = true;
+            }
+            if (precio != null) {
+                if (hasContent) card.add(LineComponent.build());
+                card.add(precio); hasContent = true;
+            }
+            if (uxb != null) {
+                if (hasContent) card.add(LineComponent.build());
+                card.add(uxb);
+            }
 
-            // Armás la tabla horizontal con imagen y texto
             Table horizontalLayout = new Table(UnitValue.createPercentArray(new float[]{1, 1}))
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
@@ -65,24 +64,29 @@ public class CellBuilder {
             card.setVerticalAlignment(VerticalAlignment.MIDDLE)
                     .setHorizontalAlignment(HorizontalAlignment.CENTER);
 
-            if (esPar) {
-                horizontalLayout.addCell(new Cell()
-                        .add(image)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .setBorder(Border.NO_BORDER));
-
-                horizontalLayout.addCell(new Cell()
-                        .add(card)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .setBorder(Border.NO_BORDER));
+            if (image != null) {
+                if (esPar) {
+                    horizontalLayout.addCell(new Cell()
+                            .add(image)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(Border.NO_BORDER));
+                    horizontalLayout.addCell(new Cell()
+                            .add(card)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(Border.NO_BORDER));
+                } else {
+                    horizontalLayout.addCell(new Cell()
+                            .add(card)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(Border.NO_BORDER));
+                    horizontalLayout.addCell(new Cell()
+                            .add(image)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(Border.NO_BORDER));
+                }
             } else {
-                horizontalLayout.addCell(new Cell()
+                horizontalLayout.addCell(new Cell(1, 2)
                         .add(card)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .setBorder(Border.NO_BORDER));
-
-                horizontalLayout.addCell(new Cell()
-                        .add(image)
                         .setVerticalAlignment(VerticalAlignment.MIDDLE)
                         .setBorder(Border.NO_BORDER));
             }
@@ -93,24 +97,31 @@ public class CellBuilder {
                     .setPaddingTop(2);
 
             if (itemsThisPage + 1 <= 3 && productsPerPage == 4) {
-                cell.add(linea);
+                cell.add(LineComponent.build());
             }
 
             if (itemsThisPage + 1 <= 1 && productsPerPage == 2) {
-                cell.add(linea);
+                cell.add(LineComponent.build());
             }
 
             return cell;
         } else {
-            // Distribución vertical tradicional
-            card.add(codigo);
-            card.add(image);
-            card.add(linea);
-            card.add(nombre);
-            card.add(linea);
-            card.add(precio);
-            card.add(linea);
-            card.add(uxb);
+            // Distribucion vertical tradicional
+            boolean hasContent = false;
+            if (codigo != null) { card.add(codigo); hasContent = true; }
+            if (image != null) card.add(image);
+            if (nombre != null) {
+                if (hasContent) card.add(LineComponent.build());
+                card.add(nombre); hasContent = true;
+            }
+            if (precio != null) {
+                if (hasContent) card.add(LineComponent.build());
+                card.add(precio); hasContent = true;
+            }
+            if (uxb != null) {
+                if (hasContent) card.add(LineComponent.build());
+                card.add(uxb);
+            }
 
             return new Cell()
                     .add(card)

@@ -84,8 +84,8 @@ public class ExcelUtils {
                         return "";
                 }
             case ERROR:
-                throw new Exception("Error en la celda fila: " + cell.getAddress().getRow() + 1 + " columna: "
-                        + cell.getAddress().getColumn() + 1);
+                throw new Exception("Error en la celda fila: " + (cell.getAddress().getRow() + 1) + " columna: "
+                        + (cell.getAddress().getColumn() + 1));
             case BLANK:
             default:
                 return "";

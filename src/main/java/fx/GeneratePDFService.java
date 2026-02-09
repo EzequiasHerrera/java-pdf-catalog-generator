@@ -1,14 +1,16 @@
 package fx;
 
+import com.itextpdf.kernel.colors.Color;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.control.TextArea;
+import javafx.scene.text.TextFlow;
 import enums.PageType;
+import service.PDFGenerationStats;
 import service.PDFGenerator;
 
 import java.io.File;
 
-public class GeneratePDFService extends Service<Integer> {
+public class GeneratePDFService extends Service<PDFGenerationStats> {
     private final File archivoExcel;
     private final File carpetaImagenes;
     private final boolean caratula;
@@ -26,13 +28,25 @@ public class GeneratePDFService extends Service<Integer> {
     // VARIABLES BOOLEAN PARA SABER SI TIENE IMAGEN Y PARA TRAER EL TEXTAREA PARA EL
     // LOG
     private final boolean imagenes;
-    private final TextArea logTextArea;
+    private final TextFlow logTextFlow;
     private final int productoQuantity;
     private final String titleTextInput;
     private final String subtitleTextInput;
 
     private final String selectedTheme;
     private final boolean presupuestoActivo;
+
+    // Font sizes
+    private final float codigoFontSize;
+    private final float productoFontSize;
+    private final float precioFontSize;
+    private final float uxbFontSize;
+
+    // Font colors
+    private final Color codigoColor;
+    private final Color productoColor;
+    private final Color precioColor;
+    private final Color uxbColor;
 
     // CONSTRUCTOR
     public GeneratePDFService(
@@ -51,12 +65,20 @@ public class GeneratePDFService extends Service<Integer> {
             boolean unidadPorBultoColumn,
 
             boolean imagenes,
-            TextArea logTextArea,
+            TextFlow logTextFlow,
             int productoQuantity,
             String titleTextInput,
             String subtitleTextInput,
             String selectedTheme,
-            boolean presupuestoActivo
+            boolean presupuestoActivo,
+            float codigoFontSize,
+            float productoFontSize,
+            float precioFontSize,
+            float uxbFontSize,
+            Color codigoColor,
+            Color productoColor,
+            Color precioColor,
+            Color uxbColor
     ) {
 
         // ASIGNO EL VALOR A CADA VARIABLE CON EL VALOR DE LAS VARIABLES QUE ENTRAN COMO
@@ -75,25 +97,35 @@ public class GeneratePDFService extends Service<Integer> {
         this.unidadPorBultoColumn = unidadPorBultoColumn;
 
         this.imagenes = imagenes;
-        this.logTextArea = logTextArea;
+        this.logTextFlow = logTextFlow;
         this.productoQuantity = productoQuantity;
         this.titleTextInput = titleTextInput;
         this.subtitleTextInput = subtitleTextInput;
 
         this.selectedTheme = selectedTheme;
         this.presupuestoActivo = presupuestoActivo;
+        this.codigoFontSize = codigoFontSize;
+        this.productoFontSize = productoFontSize;
+        this.precioFontSize = precioFontSize;
+        this.uxbFontSize = uxbFontSize;
+        this.codigoColor = codigoColor;
+        this.productoColor = productoColor;
+        this.precioColor = precioColor;
+        this.uxbColor = uxbColor;
     }
 
     @Override // Task es asincronismo. Permite correr en segundo plano
     //FUNCIÓN ASINCRONICA QUE DEVUELVE UN INT <INTEGER> QUE CONTIENE LA CANTIDAD DE PRODUCTOS GENERADOS
-    protected Task<Integer> createTask() {
+    protected Task<PDFGenerationStats> createTask() {
         return new Task<>() {
             @Override
-            protected Integer call() throws Exception {
+            protected PDFGenerationStats call() throws Exception {
                 return PDFGenerator.generarPDF(archivoExcel, carpetaImagenes, caratula, archivoDestino,
                         imageSize, pageType,
                         codigoColumn, productoColumn, precioColumn, unidadPorBultoColumn,
-                        imagenes, logTextArea, productoQuantity, titleTextInput, subtitleTextInput, selectedTheme, presupuestoActivo);
+                        imagenes, logTextFlow, productoQuantity, titleTextInput, subtitleTextInput, selectedTheme, presupuestoActivo,
+                        codigoFontSize, productoFontSize, precioFontSize, uxbFontSize,
+                        codigoColor, productoColor, precioColor, uxbColor);
             }
         };
     }

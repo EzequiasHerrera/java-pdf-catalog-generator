@@ -33,7 +33,8 @@ public class FooterHandler extends AbstractPdfDocumentEventHandler {
         // Si hay carátula, omitimos solo la primera página
         if (caratula && pageNumber == 1) return;
 
-        drawFooter(page, pageNumber);
+        int displayPageNumber = caratula ? pageNumber - 1 : pageNumber;
+        drawFooter(page, displayPageNumber);
     }
 
     private void drawFooter(PdfPage page, int pageNumber) {
