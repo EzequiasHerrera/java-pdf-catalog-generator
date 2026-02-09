@@ -32,10 +32,10 @@ public class CellBuilder {
 
         Div card = DivComponent.build(productsPerPage, theme, availableWidthSpace);
 
-        Paragraph codigo = codigoColumn ? CodigoComponent.build(row.getCell(0), theme, availableWidthSpace, codigoFontSize, codigoColor) : null;
-        Paragraph nombre = productoColumn ? NombreComponent.build(row.getCell(1), theme, productoFontSize, productoColor) : null;
-        Paragraph precio = precioColumn ? PrecioComponent.build(row.getCell(2), theme, precioFontSize, precioColor) : null;
-        Paragraph uxb = unidadPorBultoColumn ? UxBComponent.build(row.getCell(3), theme, uxbFontSize, uxbColor) : null;
+        Paragraph codigo = codigoColumn ? CodigoComponent.build(row.getCell(0), theme, availableWidthSpace, codigoFontSize, codigoColor, log) : null;
+        Paragraph nombre = productoColumn ? NombreComponent.build(row.getCell(1), theme, productoFontSize, productoColor, log) : null;
+        Paragraph precio = precioColumn ? PrecioComponent.build(row.getCell(2), theme, precioFontSize, precioColor, log) : null;
+        Paragraph uxb = unidadPorBultoColumn ? UxBComponent.build(row.getCell(3), theme, uxbFontSize, uxbColor, log) : null;
         Image image = imagenes ? ImagenComponent.build(row.getCell(0), carpetaImagenes, imageSize, log, stats) : null;
 
         if (productsPerPage <= 4) {

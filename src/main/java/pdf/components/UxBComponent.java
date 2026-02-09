@@ -11,8 +11,10 @@ import pdf.themes.Theme;
 import utils.ExcelUtils;
 import utils.PDFUtils;
 
+import java.util.function.Consumer;
+
 public class UxBComponent {
-    public static Paragraph build(Cell cell, Theme theme, float fontSize, Color fontColor) {
+    public static Paragraph build(Cell cell, Theme theme, float fontSize, Color fontColor, Consumer<String> log) {
         try {
             String rawText = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "--");
 
@@ -39,6 +41,7 @@ public class UxBComponent {
                     .setMargin(0)
                     .setPadding(1);
         } catch (Exception e) {
+            log.accept("Error al leer UxB en celda: " + e.getMessage() + "\n");
             return new Paragraph("UxB: ")
                     .add("-")
                     .setFontSize(fontSize)

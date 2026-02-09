@@ -10,8 +10,10 @@ import pdf.themes.Theme;
 import utils.ExcelUtils;
 import utils.PDFUtils;
 
+import java.util.function.Consumer;
+
 public class NombreComponent {
-    public static Paragraph build(Cell cell, Theme theme, float fontSize, Color fontColor) {
+    public static Paragraph build(Cell cell, Theme theme, float fontSize, Color fontColor, Consumer<String> log) {
         try {
             String nombreValue = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "[SIN NOMBRE]");
 
@@ -25,6 +27,7 @@ public class NombreComponent {
                     .setPadding(2);
 
         } catch (Exception e) {
+            log.accept("Error al leer nombre en celda: " + e.getMessage() + "\n");
             return new Paragraph("[SIN NOMBRE]")
                     .simulateBold()
                     .setFontSize(fontSize)

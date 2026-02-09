@@ -128,10 +128,21 @@ public class CommandLine {
                         String listaPrecios = ExcelUtils.getCellValue(row.getCell(0)); //
                         String mixProductos = ExcelUtils.getCellValue(row.getCell(1)); //
                         String clasificacion = ExcelUtils.getCellValue(row.getCell(2)); //
-                        boolean caratula = ExcelUtils.getCellValue(row.getCell(3)).equalsIgnoreCase("SI"); //
+                        String caratulaValue = ExcelUtils.getCellValue(row.getCell(3));
+                        boolean caratula = caratulaValue.equalsIgnoreCase("SI"); //
+                        if (!caratula && !caratulaValue.equalsIgnoreCase("NO") && !caratulaValue.isBlank()) {
+                            System.err.println("WARNING Fila " + (r + 1) + ": Valor de carátula '" + caratulaValue + "' no reconocido (se esperaba 'SI' o 'NO'). Se usó 'NO' por defecto.");
+                        }
                         String title = ExcelUtils.getCellValue(row.getCell(4)); //
                         String selectedTheme = ExcelUtils.getCellValue(row.getCell(5)); //
-                        boolean presupuesto = ExcelUtils.getCellValue(row.getCell(6)).equalsIgnoreCase("PRESUPUESTO"); //
+                        if (!selectedTheme.equalsIgnoreCase("KT") && !selectedTheme.equalsIgnoreCase("LINEA GE") && !selectedTheme.isBlank()) {
+                            System.err.println("WARNING Fila " + (r + 1) + ": Tema '" + selectedTheme + "' no reconocido (se esperaba 'KT' o 'LINEA GE'). Se usará 'LINEA GE' por defecto.");
+                        }
+                        String presupuestoValue = ExcelUtils.getCellValue(row.getCell(6));
+                        boolean presupuesto = presupuestoValue.equalsIgnoreCase("PRESUPUESTO"); //
+                        if (!presupuesto && !presupuestoValue.equalsIgnoreCase("CATALOGO") && !presupuestoValue.isBlank()) {
+                            System.err.println("WARNING Fila " + (r + 1) + ": Valor de presupuesto '" + presupuestoValue + "' no reconocido (se esperaba 'PRESUPUESTO' o 'CATALOGO'). Se usó 'CATALOGO' por defecto.");
+                        }
                         int productoQuantity = (int) Double.parseDouble(ExcelUtils.getCellValue(row.getCell(7))); //
                         String subtitle = formatter.format(LocalDate.now()); // Fecha actual
                         String carpetaDestino = ExcelUtils.getCellValue(row.getCell(8)); //
@@ -296,10 +307,10 @@ public class CommandLine {
                     System.out.println(dtf.format(LocalDateTime.now()) + ": " + stats.productosGenerados + " productos han sido generados.");
                     System.out.println(dtf.format(LocalDateTime.now()) + ": \"" + archivoDestinoPdf.getAbsolutePath() + "\" generado.");
                 } else {
-                    System.out.println(dtf.format(LocalDateTime.now()) + ": El archivo Excel de origen no existe o está vacío para: " + listaPrecios + " - " + mixProductos + (clasificacion.isBlank() ? "" : " - " + clasificacion));
+                    System.err.println(dtf.format(LocalDateTime.now()) + ": El archivo Excel de origen no existe o está vacío para: " + listaPrecios + " - " + mixProductos + (clasificacion.isBlank() ? "" : " - " + clasificacion));
                 }
             } else {
-                System.out.println(dtf.format(LocalDateTime.now()) + ": La ubicacion: " + carpetaDestinoFile.getAbsolutePath() + " no existe.");
+                System.err.println(dtf.format(LocalDateTime.now()) + ": La ubicacion: " + carpetaDestinoFile.getAbsolutePath() + " no existe.");
             }
         }
         System.out.println("------------------------------------------------------------------------------------------------------------------");

@@ -10,8 +10,10 @@ import pdf.themes.Theme;
 import utils.ExcelUtils;
 import utils.PDFUtils;
 
+import java.util.function.Consumer;
+
 public class PrecioComponent {
-    public static Paragraph build(Cell cell, Theme theme, float fontSize, Color fontColor) {
+    public static Paragraph build(Cell cell, Theme theme, float fontSize, Color fontColor, Consumer<String> log) {
         try {
             String precioText = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "--");
             String precioValue = PDFUtils.formatPrice(precioText);
@@ -28,6 +30,7 @@ public class PrecioComponent {
                     .setMargin(0);
 
         } catch (Exception e) {
+            log.accept("Error al leer precio en celda: " + e.getMessage() + "\n");
             Text precioBold = new Text("--").simulateBold();
 
             return new Paragraph("PRECIO: \n")

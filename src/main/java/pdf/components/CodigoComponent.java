@@ -11,8 +11,10 @@ import pdf.themes.Theme;
 import utils.ExcelUtils;
 import utils.PDFUtils;
 
+import java.util.function.Consumer;
+
 public class CodigoComponent {
-    public static Paragraph build(Cell cell, Theme theme, float availableWidthSpace, float fontSize, Color fontColor) {
+    public static Paragraph build(Cell cell, Theme theme, float availableWidthSpace, float fontSize, Color fontColor, Consumer<String> log) {
         try {
             String codigoValue = PDFUtils.safeText(ExcelUtils.getCellValue(cell), "[SIN CÓDIGO]");
 
@@ -31,6 +33,7 @@ public class CodigoComponent {
                     .setWidth(availableWidthSpace)
                     .setHorizontalAlignment(HorizontalAlignment.CENTER);
         } catch (Exception e) {
+            log.accept("Error al leer código en celda: " + e.getMessage() + "\n");
             return new Paragraph("CODIGO")
                     .setMargin(0)
                     .setMarginBottom(2)
