@@ -9,10 +9,19 @@ import utils.ExcelUtils;
 import utils.PDFUtils;
 import utils.ValidationUtils;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +32,8 @@ import service.PDFGenerationStats;
 public class ImagenComponent {
 
     private static final String[] EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp"};
+    private static final float TARGET_DPI = 400f;
+    private static final float JPEG_QUALITY = 0.95f;
     private static final ImageData sinImagen;
 
     static {
@@ -88,13 +99,13 @@ public class ImagenComponent {
 
                             BufferedImage cropped = original.getSubimage(left, top, right - left + 1, bottom - top + 1);
 
-                            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                                ImageIO.write(cropped, "png", baos);
-                                return new Image(ImageDataFactory.create(baos.toByteArray()))
-                                        .scaleToFit(imageSize, imageSize)
-                                        .setAutoScale(false)
-                                        .setHorizontalAlignment(HorizontalAlignment.CENTER);
-                            }
+                            int targetPx = Math.round(imageSize * TARGET_DPI / 72f);
+                            BufferedImage prepared = prepareForJpeg(cropped, targetPx);
+                            byte[] jpegBytes = encodeJpeg(prepared, JPEG_QUALITY);
+                            return new Image(ImageDataFactory.create(jpegBytes))
+                                    .scaleToFit(imageSize, imageSize)
+                                    .setAutoScale(false)
+                                    .setHorizontalAlignment(HorizontalAlignment.CENTER);
                         } else {
                             stats.imagenEnBlanco++;
                             log.accept("La imagen parece estar completamente en blanco: " + codigoImagen + ext + "\n");
@@ -118,6 +129,50 @@ public class ImagenComponent {
                 .scaleToFit(imageSize, imageSize)
                 .setAutoScale(false)
                 .setHorizontalAlignment(HorizontalAlignment.CENTER);
+    }
+
+    private static BufferedImage prepareForJpeg(BufferedImage src, int maxDim) {
+        int w = src.getWidth();
+        int h = src.getHeight();
+        int largest = Math.max(w, h);
+        int targetW;
+        int targetH;
+        if (largest > maxDim) {
+            double scale = (double) maxDim / largest;
+            targetW = Math.max(1, (int) Math.round(w * scale));
+            targetH = Math.max(1, (int) Math.round(h * scale));
+        } else {
+            targetW = w;
+            targetH = h;
+        }
+        BufferedImage out = new BufferedImage(targetW, targetH, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = out.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, targetW, targetH);
+        g.drawImage(src, 0, 0, targetW, targetH, null);
+        g.dispose();
+        return out;
+    }
+
+    private static byte[] encodeJpeg(BufferedImage img, float quality) throws IOException {
+        ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ImageOutputStream ios = ImageIO.createImageOutputStream(baos)) {
+            writer.setOutput(ios);
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionQuality(quality);
+            if (param instanceof JPEGImageWriteParam) {
+                ((JPEGImageWriteParam) param).setOptimizeHuffmanTables(true);
+            }
+            writer.write(null, new IIOImage(img, null, null), param);
+            return baos.toByteArray();
+        } finally {
+            writer.dispose();
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.WriterProperties;
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.AreaBreak;
@@ -93,7 +94,8 @@ public class PDFGenerator {
                 }
                 final int lastRowIndex = sheet.getLastRowNum();
 
-                try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath());
+                try (final PdfWriter writer = new PdfWriter(archivoDestino.getAbsolutePath(),
+                        new WriterProperties().setFullCompressionMode(true).setCompressionLevel(9));
                      final PdfDocument pdfDoc = new PdfDocument(writer);
                      final Document doc = new Document(pdfDoc, pageType.toPageSize())) {
 
